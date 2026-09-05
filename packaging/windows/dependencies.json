@@ -1,0 +1,22 @@
+{
+  "yt-dlp": {
+    "version": "2026.08.19",
+    "url": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.08.19/yt-dlp.exe",
+    "sha256": "66674953fe251b89f4d08c5f0e35e0728679bd67ab3d7d05c0562af101dd3e7a"
+  },
+  "ffmpeg": {
+    "version": "n9.0.1-26-g5c8e7e2433-lgpl-shared",
+    "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-09-05-13-10/ffmpeg-n9.0.1-26-g5c8e7e2433-win64-lgpl-shared-9.0.zip",
+    "sha256": "f0f6eba08f6d03ddf86a259133710d129b1b373bdbff7b4ed2c6c78bc8dca634"
+  },
+  "deno": {
+    "version": "2.9.6",
+    "url": "https://github.com/denoland/deno/releases/download/v2.9.6/deno-x86_64-pc-windows-msvc.zip",
+    "sha256": "15e5300b0ba3c3695a7621d90160a746ec9e710228cee639afa9d580f6e3cd11"
+  },
+  "inno": {
+    "version": "6.7.3",
+    "url": "https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe",
+    "sha256": "9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732"
+  }
+}

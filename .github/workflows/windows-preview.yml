@@ -1,0 +1,40 @@
+name: Windows preview packages
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AVALONIA_TELEMETRY_OPTOUT: '1'
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Restore and test
+        run: |
+          dotnet restore LumeFetch.sln
+          dotnet test LumeFetch.sln -c Release --no-restore
+      - name: Verified tools
+        shell: pwsh
+        run: ./scripts/Get-WindowsTools.ps1 -IncludeInstallerCompiler
+      - name: Native media pipeline and headless UI smoke
+        run: dotnet run --project tools/LumeFetch.Screenshot -c Release -- --smoke
+      - name: Package
+        shell: pwsh
+        run: ./scripts/Publish-Windows.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LumeFetch-windows-preview
+          path: |
+            artifacts/releases/**/*.zip
+            artifacts/releases/**/*-setup.exe
+            artifacts/releases/**/SHA256SUMS.txt
+          if-no-files-found: error
+      # No automatic public release: complete docs/RELEASE-CHECKLIST.md first.

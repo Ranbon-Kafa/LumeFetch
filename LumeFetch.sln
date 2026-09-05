@@ -1,0 +1,46 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LumeFetch.Core", "src\LumeFetch.Core\LumeFetch.Core.csproj", "{2C9F51ED-78BB-4B89-8D8F-D083BB9C5A5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LumeFetch.Infrastructure", "src\LumeFetch.Infrastructure\LumeFetch.Infrastructure.csproj", "{678B86F0-5261-49F7-84BE-6F14D9284B52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LumeFetch.Desktop", "src\LumeFetch.Desktop\LumeFetch.Desktop.csproj", "{514D066B-5DF2-444F-A956-B3944E70EAE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LumeFetch.Core.Tests", "tests\LumeFetch.Core.Tests\LumeFetch.Core.Tests.csproj", "{EC183B1C-8DCB-40DD-AB54-D2D5138C504A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LumeFetch.Screenshot", "tools\LumeFetch.Screenshot\LumeFetch.Screenshot.csproj", "{6731A6B9-A6D2-4E62-BD67-2EFB635C06E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C9F51ED-78BB-4B89-8D8F-D083BB9C5A5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C9F51ED-78BB-4B89-8D8F-D083BB9C5A5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C9F51ED-78BB-4B89-8D8F-D083BB9C5A5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C9F51ED-78BB-4B89-8D8F-D083BB9C5A5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{678B86F0-5261-49F7-84BE-6F14D9284B52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{678B86F0-5261-49F7-84BE-6F14D9284B52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{678B86F0-5261-49F7-84BE-6F14D9284B52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{678B86F0-5261-49F7-84BE-6F14D9284B52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{514D066B-5DF2-444F-A956-B3944E70EAE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{514D066B-5DF2-444F-A956-B3944E70EAE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{514D066B-5DF2-444F-A956-B3944E70EAE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{514D066B-5DF2-444F-A956-B3944E70EAE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC183B1C-8DCB-40DD-AB54-D2D5138C504A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC183B1C-8DCB-40DD-AB54-D2D5138C504A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC183B1C-8DCB-40DD-AB54-D2D5138C504A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC183B1C-8DCB-40DD-AB54-D2D5138C504A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6731A6B9-A6D2-4E62-BD67-2EFB635C06E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6731A6B9-A6D2-4E62-BD67-2EFB635C06E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6731A6B9-A6D2-4E62-BD67-2EFB635C06E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6731A6B9-A6D2-4E62-BD67-2EFB635C06E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

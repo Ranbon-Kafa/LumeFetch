@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>LumeFetch.Desktop</RootNamespace>
+    <AssemblyName>LumeFetch</AssemblyName>
+    <Version>0.2.1</Version>
+    <Product>LumeFetch</Product>
+    <Authors>Ranbon-Kafa;LumeFetch contributors</Authors>
+    <Company>ruzgarefe.com</Company>
+    <Copyright>Copyright (c) 2026 Ranbon-Kafa (https://ruzgarefe.com) and LumeFetch contributors</Copyright>
+    <PackageProjectUrl>https://ruzgarefe.com</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Ranbon-Kafa/LumeFetch</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>One downloader. Many platforms. Open source.</Description>
+    <ApplicationIcon>Assets/lumefetch.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/*" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LumeFetch.Core\LumeFetch.Core.csproj" />
+    <ProjectReference Include="..\LumeFetch.Infrastructure\LumeFetch.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

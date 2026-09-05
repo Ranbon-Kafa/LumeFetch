@@ -1,0 +1,40 @@
+# Build output
+bin/
+obj/
+artifacts/
+TestResults/
+
+# Local SDK and tools
+.tools/
+tools/ffmpeg/
+tools/yt-dlp/
+tools/deno/
+
+# IDE and user files
+.idea/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local settings and downloads
+src/LumeFetch.Desktop/appsettings.local.json
+/downloads/
+*.part
+
+# Local credentials, assistant metadata and Avalonia build diagnostics
+/.agents/
+/.codex/
+/.env
+/.env.*
+*.pfx
+*.p12
+*.pem
+*.key
+cookies*.txt
+**/AvaloniaUI/
+/data/

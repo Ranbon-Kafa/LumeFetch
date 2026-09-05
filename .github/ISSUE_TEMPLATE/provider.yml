@@ -1,0 +1,29 @@
+name: Provider request
+description: Request support for a media source
+title: "[Provider]: "
+labels: ["provider", "needs-triage"]
+body:
+  - type: input
+    id: service
+    attributes:
+      label: Service name
+    validations:
+      required: true
+  - type: input
+    id: public_url
+    attributes:
+      label: Public example URL
+      description: Do not submit private, paid, or account-only URLs.
+    validations:
+      required: true
+  - type: textarea
+    id: allowed
+    attributes:
+      label: Download permission or source policy
+      description: Link to the relevant terms or permission when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: formats
+    attributes:
+      label: Expected formats and metadata
