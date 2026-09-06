@@ -42,6 +42,7 @@ public sealed partial class MainWindowViewModel
     }
     public QualityChoice BatchQuality { get => _batchQuality; set => SetProperty(ref _batchQuality, value); }
     public string SpotifyClientId { get => _spotifyClientId; set => SetProperty(ref _spotifyClientId, value); }
+    public bool IsSpotifyAvailable => _spotifyResolver is not null;
     public string SpotifyStatus => Localizer.Current[_spotifyStatusKey];
     public string SpotifyRedirectUri { get; } = SpotifySession.RedirectUri;
     public bool IsConnectingSpotify { get => _isConnectingSpotify; private set => SetProperty(ref _isConnectingSpotify, value); }
@@ -95,6 +96,7 @@ public sealed partial class MainWindowViewModel
 
     public async Task ConnectSpotifyAsync(Func<Uri, Task> openBrowser)
     {
+        if (!IsSpotifyAvailable) { SettingsMessage = Localizer.Current["SpotifyDisabled"]; return; }
         if (_spotifySession is null || IsConnectingSpotify) return;
         IsConnectingSpotify = true; _spotifyStatusKey = "SpotifyConnecting"; OnPropertyChanged(nameof(SpotifyStatus));
         try
@@ -111,6 +113,11 @@ public sealed partial class MainWindowViewModel
 
     private async Task<bool> TryAnalyzeCollectionAsync(Uri uri, int version, CancellationToken token)
     {
+        if (!IsSpotifyAvailable && (uri.Host.Equals("spotify.com", StringComparison.OrdinalIgnoreCase) ||
+            uri.Host.EndsWith(".spotify.com", StringComparison.OrdinalIgnoreCase) ||
+            uri.Host.Equals("spotify.link", StringComparison.OrdinalIgnoreCase) ||
+            uri.Host.EndsWith(".spotify.link", StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException(Localizer.Current["SpotifyDisabled"]);
         if (_spotifyResolver?.CanResolve(uri) == true)
         {
             if (_spotifySession is { IsConnected: false }) throw new InvalidOperationException(Localizer.Current["SpotifyRequired"]);

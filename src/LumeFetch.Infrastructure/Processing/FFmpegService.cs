@@ -8,7 +8,7 @@ public sealed class FFmpegService : IFFmpegService
 {
     public FFmpegService(string? executablePath = null)
     {
-        ExecutablePath = executablePath ?? ExternalToolLocator.Find("ffmpeg", Path.Combine(Environment.CurrentDirectory, ".tools", "ffmpeg"));
+        ExecutablePath = executablePath ?? ExternalToolLocator.Find("ffmpeg", Path.Combine(Environment.CurrentDirectory, ".tools", "ffmpeg-lumefetch"));
     }
 
     public string? ExecutablePath { get; }

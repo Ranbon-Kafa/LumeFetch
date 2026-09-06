@@ -1,0 +1,20 @@
+[
+  {"component":"Deno 2.9.6", "file":"deno-2.9.6.tar.gz", "url":"https://codeload.github.com/denoland/deno/tar.gz/refs/tags/v2.9.6", "sha256":"d27f0ec13979c5dc76c7a0f20d5a389041746c005025102c1e220fa034674bbb"},
+  {"component":"Deno dependency lock", "file":"deno-Cargo.lock", "url":"https://raw.githubusercontent.com/denoland/deno/v2.9.6/Cargo.lock", "sha256":"6c6af74640994cc41fcc7f46bb5204a50da679adc2dee96cb05aa97867baf7e1", "input":true},
+  {"component":"yt-dlp Python dependency lock", "file":"yt-dlp-curl-cffi-requirements.txt", "url":"https://raw.githubusercontent.com/yt-dlp/yt-dlp/2026.08.19/bundle/requirements/curl-cffi.txt", "sha256":"898c4d3bf40a6f1cb59e8cb8184536c0b97c543367e3256621a5b6d791729632", "input":true},
+  {"component":"yt-dlp 2026.08.19 with build recipes", "file":"yt-dlp-2026.08.19.tar.gz", "url":"https://codeload.github.com/yt-dlp/yt-dlp/tar.gz/refs/tags/2026.08.19", "sha256":"a0779c45179a846986a852bce31bddbe9259b594574f75c0ec146d0567058f7e"},
+  {"component":"CPython 3.10.11", "file":"Python-3.10.11.tar.xz", "url":"https://www.python.org/ftp/python/3.10.11/Python-3.10.11.tar.xz", "sha256":"3c3bc3048303721c904a03eb8326b631e921f11cc3be2988456a42f115daf04c"},
+  {"component":"FFmpeg 9.0.1", "file":"ffmpeg-9.0.1.tar.xz", "url":"https://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz", "sha256":"cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635"},
+  {"component":"LAME 3.100", "file":"lame-3.100.tar.gz", "url":"https://deb.debian.org/debian/pool/main/l/lame/lame_3.100.orig.tar.gz", "sha256":"ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"},
+  {"component":"Opus 1.6.1", "file":"opus-1.6.1.tar.gz", "url":"https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz", "sha256":"6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1"},
+  {"component":"zlib 1.3.2 (FFmpeg)", "file":"zlib-1.3.2.tar.gz", "url":"https://zlib.net/zlib-1.3.2.tar.gz", "sha256":"bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16"},
+  {"component":"curl-impersonate 2.0.0 with Windows patches/build recipes", "file":"curl-impersonate-2.0.0.tar.gz", "url":"https://codeload.github.com/lexiforest/curl-impersonate/tar.gz/refs/tags/v2.0.0", "sha256":"a9827cfce8246e78b86e26f012ae9fcb9bc05822009cd7ce4c9e130af6bdfb6f"},
+  {"component":"Brotli 1.2.0 (curl)", "file":"brotli-native-1.2.0.tar.gz", "url":"https://github.com/google/brotli/archive/refs/tags/v1.2.0.tar.gz", "sha256":"816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec"},
+  {"component":"BoringSSL 156c7b75 (curl)", "file":"boringssl-156c7b75.zip", "url":"https://github.com/google/boringssl/archive/156c7b75ae9b8c3b3f847acf264f17594c3859fb.zip", "sha256":"450e169b284697c6eafe523cb7679f4221fbe1a0993f773a566c33b188762844"},
+  {"component":"nghttp2 1.63.0", "file":"nghttp2-1.63.0.tar.bz2", "url":"https://github.com/nghttp2/nghttp2/releases/download/v1.63.0/nghttp2-1.63.0.tar.bz2", "sha256":"607b174554d22a828bc532d1d734fe0f729b5d5ed207f2f12e96a62e83f29c55"},
+  {"component":"ngtcp2 1.20.0", "file":"ngtcp2-1.20.0.tar.bz2", "url":"https://github.com/ngtcp2/ngtcp2/releases/download/v1.20.0/ngtcp2-1.20.0.tar.bz2", "sha256":"871ec97ad86803cf312901b0c393b0ee70163e25a87c9b2894d1234341ce4e97"},
+  {"component":"nghttp3 1.15.0", "file":"nghttp3-1.15.0.tar.bz2", "url":"https://github.com/ngtcp2/nghttp3/releases/download/v1.15.0/nghttp3-1.15.0.tar.bz2", "sha256":"c6c491a52804814098e446630e6efc459afc0d3da7952ffe6cbdc0b3f99b2b62"},
+  {"component":"zlib 1.3.1 (curl)", "file":"zlib-1.3.1.tar.gz", "url":"https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz", "sha256":"9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"},
+  {"component":"zstd 1.5.7", "file":"zstd-1.5.7.tar.gz", "url":"https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz", "sha256":"eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3"},
+  {"component":"curl 8.21.0", "file":"curl-8.21.0.tar.gz", "url":"https://github.com/curl/curl/archive/curl-8_21_0.tar.gz", "sha256":"ec753aa6f408a3ca9f0d6d5f7a77417aecd1544db13c03ae5d443612bf367364"}
+]

@@ -54,6 +54,24 @@ internal static partial class Program
         var registry = new ProviderRegistry([new PreviewProvider()]);
         await using var manager = new DownloadManager(registry);
         var catalog = new PreviewCatalog();
+        await using (var releaseManager = new DownloadManager(registry))
+        using (var releaseVm = new MainWindowViewModel(new MediaAnalysisService(registry), releaseManager,
+            new FFmpegService(), store, settings, collections: catalog))
+        {
+            Require(!releaseVm.IsSpotifyAvailable, "v1 does not register Spotify");
+            await releaseVm.AnalyzeFromPasteAsync("https://open.spotify.com/track/fixture");
+            Require(!releaseVm.HasResult && !releaseVm.HasCollection && releaseVm.ErrorMessage?.Contains("disabled", StringComparison.Ordinal) == true,
+                "Disabled Spotify URL never falls through to a downloader");
+            var browserOpened = false;
+            await releaseVm.ConnectSpotifyAsync(_ => { browserOpened = true; return Task.CompletedTask; });
+            Require(!browserOpened, "Disabled Spotify never starts authentication");
+            var releaseWindow = new MainWindow { Width = 1220, Height = 960, DataContext = releaseVm };
+            releaseWindow.Show();
+            releaseVm.ShowSettingsCommand.Execute(null);
+            Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+            Capture(releaseWindow, Path.Combine(Path.GetDirectoryName(output)!, "lumefetch-settings.png"));
+            releaseWindow.Close();
+        }
         using var viewModel = new MainWindowViewModel(new MediaAnalysisService(registry), manager,
             new FFmpegService(), store, settings, collections: catalog, spotifyResolver: catalog, trackSearch: catalog);
         var window = new MainWindow { Width = 1220, Height = 960, DataContext = viewModel };
@@ -71,7 +89,7 @@ internal static partial class Program
         viewModel.SaveSettingsCommand.Execute(null);
         await UntilAsync(() => viewModel.SettingsMessage?.StartsWith("Saved.", StringComparison.Ordinal) == true);
         Require(store.Load().MaxParallelDownloads == 3 && manager.MaxParallelDownloads == 3, "Settings persistence and live parallel limit");
-        Capture(window, Path.Combine(Path.GetDirectoryName(output)!, "lumefetch-settings.png"));
+        // The public settings screenshot above uses v1 wiring, not the experimental resolver fixture.
         viewModel.ShowHomeCommand.Execute(null);
         var stale = viewModel.AnalyzeFromPasteAsync("https://example.org/slow.mp4");
         viewModel.Url = "not a valid URL";

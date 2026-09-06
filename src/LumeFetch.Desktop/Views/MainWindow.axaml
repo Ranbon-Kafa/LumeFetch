@@ -95,6 +95,8 @@
         <Border Classes="card" Padding="24">
           <StackPanel Spacing="12">
             <TextBlock Text="{loc:Loc SpotifyTitle}" FontSize="19" FontWeight="SemiBold" Foreground="#8BF0C9" />
+            <TextBlock Text="{loc:Loc SpotifyDisabled}" IsVisible="{Binding !IsSpotifyAvailable}" TextWrapping="Wrap" Classes="muted" />
+            <StackPanel Spacing="12" IsVisible="{Binding IsSpotifyAvailable}">
             <TextBlock Text="{loc:Loc SpotifyHelp}" TextWrapping="Wrap" />
             <TextBlock Text="{loc:Loc SpotifySetup}" Classes="muted" TextWrapping="Wrap" FontSize="12" />
             <TextBox Text="{Binding SpotifyRedirectUri}" IsReadOnly="True" />
@@ -106,6 +108,7 @@
             </StackPanel>
             <TextBlock Text="{Binding SpotifyStatus}" Foreground="#8BF0C9" />
             <TextBlock Text="{loc:Loc SpotifyPolicy}" Classes="muted" TextWrapping="Wrap" FontSize="11" />
+            </StackPanel>
           </StackPanel>
         </Border>
         <Button Classes="primary" Content="{loc:Loc SaveSettings}" Command="{Binding SaveSettingsCommand}" />

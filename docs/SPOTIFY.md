@@ -1,4 +1,16 @@
-# Spotify → YouTube
+# Spotify → YouTube — v1'de kapalı / disabled in v1
+
+**v1 kullanıcıları:** Bu özellik hizmet politikalarının değerlendirilmesi için
+kapalıdır. Spotify girişi ve bağlantı çözümleme kullanılamaz. Açmak için gizli
+bir ayar yoktur; aşağıdaki bilgiler deneysel kaynak koduna aittir.
+
+The maintainer approved disabling Spotify in v1 on 2026-09-06. The desktop
+composition root registers no Spotify resolver or OAuth session. The experimental
+code and tests remain for future policy assessment, not as an enabled v1 feature.
+Spotify's [Developer Policy](https://developer.spotify.com/policy), particularly
+III.5 and III.9, restricts cross-service integration and data transfer. A successful
+login or matching test does not imply distribution approval. The following is
+historical developer documentation, **not v1 end-user setup guidance**.
 
 ## Türkçe hızlı kurulum
 

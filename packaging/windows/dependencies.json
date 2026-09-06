@@ -5,9 +5,10 @@
     "sha256": "66674953fe251b89f4d08c5f0e35e0728679bd67ab3d7d05c0562af101dd3e7a"
   },
   "ffmpeg": {
-    "version": "n9.0.1-26-g5c8e7e2433-lgpl-shared",
-    "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-09-05-13-10/ffmpeg-n9.0.1-26-g5c8e7e2433-win64-lgpl-shared-9.0.zip",
-    "sha256": "f0f6eba08f6d03ddf86a259133710d129b1b373bdbff7b4ed2c6c78bc8dca634"
+    "version": "9.0.1-lumefetch1",
+    "buildScript": "scripts/Build-FFmpeg.ps1",
+    "sources": "packaging/windows/sources.json",
+    "license": "LGPL-2.1-or-later; no GPL or nonfree components enabled"
   },
   "deno": {
     "version": "2.9.6",

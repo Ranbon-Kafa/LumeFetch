@@ -1,33 +1,44 @@
-# Windows preview release checklist
+# Windows v1 release checklist
 
-The generated installer and portable zip are unsigned local preview artifacts.
-Neither this script nor the workflow publishes a GitHub Release.
+## Completed engineering checks
 
-- [x] Pin tool versions and verify archive SHA-256 before extraction/execution.
-- [x] Build self-contained Windows x64; users do not need a .NET SDK.
-- [x] Include FFmpeg/ffprobe (shared LGPL build), yt-dlp and Deno.
-- [x] Preserve user downloads and settings during uninstall.
-- [ ] Test installation, upgrade, uninstall, folder picker and clipboard on a clean Windows 10 22H2 / Windows 11 machine.
-- [ ] Smoke-test authorized, public single-video examples for each social provider. Routing tests do not prove a platform remains available.
-- [ ] Test an authorized YouTube playlist end-to-end, including unavailable items and cancellation.
-- [ ] Complete real-account Spotify PKCE/catalog/matching acceptance, quota eligibility and developer policy review (including cross-service use and official branding/attribution). No Spotify approval is implied.
-- [ ] Check Turkish/English with native keyboard, screen reader and high-DPI scaling.
-- [ ] Obtain a code-signing identity and sign both app and installer. Unsigned previews can trigger SmartScreen.
-- [ ] Complete third-party redistribution audit. Include corresponding sources, patches, build configuration and required notices for the exact FFmpeg build and its dependencies, and all bundled standalone runtimes. Mirror required source archives alongside the binaries on GitHub Releases and on the website.
-- [ ] Review project name availability, choose the actual GitHub remote and website URL, and set release links.
-- [x] Maintainer-approved publication target: Ranbon-Kafa/LumeFetch; website: https://ruzgarefe.com. MIT terms retained.
-- [ ] Publish release notes with known limitations and SHA256SUMS.txt.
+- [x] Maintainer-approved target: Ranbon-Kafa/LumeFetch. Website is excluded from this task.
+- [x] Pin official yt-dlp/Deno assets and verify SHA-256 before extraction/execution.
+- [x] Build FFmpeg from exact sources; include MP3, Opus and PNG cover support.
+- [x] Self-contained Windows x64; .NET/FFmpeg/ffprobe/yt-dlp/Deno are bundled.
+- [x] 76 unit cases and real local-media pipeline: queue, hashes, M4A/MP3/Opus, mux and metadata/cover.
+- [x] TR/EN bindings and persistence, collection partial failure/retry/cancel in headless Avalonia.
+- [x] Installer, version upgrade, portable self-check, uninstall and preserved data on a disposable
+  GitHub-hosted Windows Server runner. Initial acceptance run: 34039854933.
+- [x] Preserve exact source archives, source hashes, notices, upstream declarations and build recipes.
+  See CORRESPONDING-SOURCES.md; this inventory is not a legal opinion.
+- [x] Disable Spotify registration/authentication/URL resolution in v1, approved by maintainer.
+- [x] Document unsigned status and supported/unsupported scope.
+- [ ] Inspect the final v1 build's acceptance result and downloaded asset checksums before publishing.
+- [ ] Publish installer, portable ZIP, corresponding sources, SHA256SUMS and release notes together.
 
-FFmpeg source revision: 5c8e7e2433, build recipe: BtbN/FFmpeg-Builds autobuild-2026-09-05-13-10.
-The pinned binary manifest is in packaging/windows/dependencies.json.
-See [FFmpeg's redistribution guidance](https://ffmpeg.org/legal.html) and [upstream build scripts](https://github.com/BtbN/FFmpeg-Builds/tree/autobuild-2026-09-05-13-10).
-The presence of a license text or an upstream URL alone is not a completed source-distribution audit.
+## Explicitly unverified / deferred
 
-## Settings and partial downloads
+These are not represented as completed tests or certifications.
 
-The installer uses %LOCALAPPDATA%/LumeFetch/settings.json. Portable builds contain
-portable.flag and use data/settings.json beside LumeFetch.exe. Save settings explicitly.
-Queue history is in memory in v0.2. Paused/canceled jobs retain partial files inside
-the chosen folder's .lumefetch/<job-id>/ directory; retry/resume works in the same
-app session. These partial files are not automatically deleted on cancel or uninstall.
-After closing LumeFetch, users may remove only unneeded per-job partial directories.
+- Windows 10 22H2 / Windows 11 clean-machine interactive testing and SmartScreen reputation.
+- Full native clipboard/folder-selection persistence, screen-reader and high-DPI audit.
+  The native folder picker was opened during local inspection; that alone is not full acceptance.
+- Live authorized downloads from each social platform and a complete live YouTube playlist.
+  Offline/provider-routing tests do not prove current website availability.
+- Code signing. v1 has no signing identity; packages are unsigned. Do not disable Windows security.
+- Spotify policy approval and broad account/album/playlist acceptance; the feature is disabled.
+- Name/trademark clearance, independent legal review, Linux/macOS packages, dynamic plugins,
+  automatic updates and persistence of queue history across restarts.
+
+## User data
+
+Installed settings: `%LOCALAPPDATA%/LumeFetch/settings.json`.
+Portable settings: `data/settings.json` beside the executable, selected by `portable.flag`.
+Save preferences explicitly. Queue history is in memory. Pause/resume/retry uses
+per-job partial files under the chosen folder's `.lumefetch/<job-id>` during the
+same session. Cancellation/uninstall does not delete these files or user downloads.
+Remove only unneeded per-job directories after closing LumeFetch.
+
+Every binary mirror must also provide the corresponding-source ZIP and notices.
+The presence of a license URL alone is not a substitute for required source distribution.

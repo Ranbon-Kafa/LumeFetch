@@ -1,5 +1,5 @@
 #ifndef AppVersion
-  #define AppVersion "0.2.1"
+  #define AppVersion "1.0.0"
 #endif
 #ifndef PublishDir
   #error PublishDir must point to the self-contained publish directory

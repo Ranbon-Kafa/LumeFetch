@@ -10,7 +10,6 @@ using LumeFetch.Desktop.Views;
 using LumeFetch.Infrastructure.Processing;
 using LumeFetch.Infrastructure.Providers;
 using LumeFetch.Infrastructure.Settings;
-using LumeFetch.Infrastructure.Spotify;
 using LumeFetch.Infrastructure.YtDlp;
 
 namespace LumeFetch.Desktop;
@@ -19,8 +18,6 @@ public sealed partial class App : Application, IDisposable
 {
     private HttpClient? _httpClient;
     private DownloadManager? _downloadManager;
-    private HttpClient? _spotifyHttp;
-    private SpotifySession? _spotifySession;
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -37,13 +34,11 @@ public sealed partial class App : Application, IDisposable
             {
                 Timeout = Timeout.InfiniteTimeSpan,
             };
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("LumeFetch/0.2");
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("LumeFetch/1.0");
 
             var settingsStore = JsonSettingsStore.CreateDefault();
             var settings = settingsStore.Load();
-            _spotifyHttp = new HttpClient(new SocketsHttpHandler { AllowAutoRedirect = false, ConnectTimeout = TimeSpan.FromSeconds(20) });
-            _spotifySession = new SpotifySession(_spotifyHttp);
-            var spotifyResolver = new SpotifyResolver(_spotifyHttp, _spotifySession);
+            // Spotify is deliberately not registered in v1 pending distribution-policy review.
             var ffmpeg = new FFmpegService(settings.FFmpegPath);
             var ytDlp = new YtDlpClient(settings.YtDlpPath, ffmpeg.ExecutablePath, settings.EmbedMetadata, settings.EmbedThumbnail);
             var providers = new ProviderRegistry(
@@ -59,7 +54,7 @@ public sealed partial class App : Application, IDisposable
             var analyzer = new MediaAnalysisService(providers);
             _downloadManager = new DownloadManager(providers, settings.MaxParallelDownloads);
             var viewModel = new MainWindowViewModel(analyzer, _downloadManager, ffmpeg, settingsStore, settings, _httpClient,
-                ytDlp, spotifyResolver, ytDlp, _spotifySession);
+                collections: ytDlp);
 
             desktop.MainWindow = new MainWindow
             {
@@ -78,8 +73,6 @@ public sealed partial class App : Application, IDisposable
         _downloadManager = null;
         _httpClient?.Dispose();
         _httpClient = null;
-        _spotifySession?.Disconnect();
-        _spotifyHttp?.Dispose();
     }
 
     private void OnDesktopExit(object? sender, ControlledApplicationLifetimeExitEventArgs e) => Dispose();

@@ -13,12 +13,19 @@
   is separate and is not inferred from typing a URL.
 - Release build and all 76 unit cases passed after adding localized handling
   for clipboard and folder-picker failures.
-- Source-built FFmpeg 9.0.1 with LAME/Opus is being prepared to replace the
-  preview's larger third-party build. Exact source archives and original notices
-  are being collected. Collection success alone is not legal certification.
+- Source-built FFmpeg 9.0.1 with LAME/Opus/zlib passed real MP3, M4A, Opus, mux,
+  PNG-cover and metadata checks. 1,079 original source archives/build inputs were
+  collected with hashes, notices and explicit declaration-only provenance for
+  13 Rust crates whose upstream provides no separate license file. Collection
+  success is not legal certification.
 - `Windows release acceptance` tests source-built tools, the real media pipeline,
   installer upgrade, portable extraction and uninstall on a disposable hosted
-  Windows worker. Its result must be inspected, not assumed from this document.
+  Windows worker. Initial acceptance passed on 2026-09-06:
+  https://github.com/Ranbon-Kafa/LumeFetch/actions/runs/34039854933.
+  This is Windows Server automation, not a Windows 10/11 desktop certification.
+- The maintainer approved disabling Spotify in v1. Runtime registration was
+  removed; new UI checks confirm rejected Spotify URLs and no OAuth browser launch.
+  Its experimental fixtures continue to test the retained source in isolation.
 - ruzgarefe.com deployment is explicitly excluded at the maintainer's request.
 
 ## Automated checks
@@ -60,16 +67,15 @@ username or local workspace path.
 
 ## Not verified by these checks
 
-- Native Windows clipboard, folder picker, accessibility and OS window behavior.
-- Clean-machine install/upgrade/uninstall and SmartScreen behavior.
-- Live Spotify login, developer-account eligibility, album/playlist access, and
-  live YouTube matching against Spotify metadata. Offline fixtures are not live
-  platform acceptance. See SPOTIFY.md.
+- Full native clipboard/folder selection, accessibility and OS window behavior.
+- Windows 10/11 clean-machine interactive install and SmartScreen behavior.
+- Broad Spotify developer eligibility and live album/playlist access. The single
+  live track check above does not establish platform policy approval. See SPOTIFY.md.
 - Live downloading from Instagram, TikTok, X or Reddit; only provider routing and
   shared format mapping are covered offline. YouTube metadata was checked during
   the initial implementation, but this is not a full live-platform acceptance run.
 - Linux/macOS runtime behavior.
-- Public redistribution readiness (see RELEASE-CHECKLIST.md).
+- Independent legal/trademark certification (see RELEASE-CHECKLIST.md).
 
 Run the checks from the repository root. Smoke outputs use unique directories
 under artifacts/pipeline-smoke and artifacts/ui-smoke; no user media is overwritten.

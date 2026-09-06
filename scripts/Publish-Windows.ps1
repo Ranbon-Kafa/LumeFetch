@@ -1,5 +1,5 @@
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '0.2.1',
+    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '1.0.0',
     [string]$Dotnet = 'dotnet',
     [string]$InnoCompiler,
     [string]$FFmpegDirectory,
@@ -11,7 +11,7 @@ $env:AVALONIA_TELEMETRY_OPTOUT = '1'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 $repo = Split-Path $PSScriptRoot -Parent
 $tools = Join-Path $repo '.tools'
-if (!$FFmpegDirectory) { $FFmpegDirectory = Join-Path $tools 'ffmpeg' }
+if (!$FFmpegDirectory) { $FFmpegDirectory = Join-Path $tools 'ffmpeg-lumefetch' }
 $FFmpegDirectory = [IO.Path]::GetFullPath($FFmpegDirectory)
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $artifacts = Join-Path $repo "artifacts/releases/$Version-$stamp"
@@ -48,6 +48,10 @@ foreach ($file in @('LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'CHANGELOG
     Copy-Item -LiteralPath (Join-Path $repo $file) -Destination $publish
 }
 Copy-Item -LiteralPath (Join-Path $repo 'packaging/windows/dependencies.json') -Destination $publish
+Copy-Item -LiteralPath (Join-Path $repo 'packaging/windows/sources.json') -Destination (Join-Path $publish 'licenses/pinned-sources.json')
+foreach ($file in @('source-inventory.json', 'review-gaps.json')) {
+    Copy-Item -LiteralPath (Join-Path $tools "source-bundle/$file") -Destination (Join-Path $publish "licenses/$file")
+}
 $binaryInventory = Get-ChildItem -LiteralPath (Join-Path $publish 'tools') -Recurse -File | ForEach-Object {
     [pscustomobject]@{ File = [IO.Path]::GetRelativePath($publish, $_.FullName).Replace('\', '/'); SHA256 = (Get-FileHash -LiteralPath $_.FullName).Hash.ToLowerInvariant() }
 }
@@ -55,12 +59,17 @@ $binaryInventory | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $publish
 & (Join-Path $FFmpegDirectory 'ffmpeg.exe') -hide_banner -buildconf 2>&1 | Set-Content -LiteralPath (Join-Path $publish 'licenses/ffmpeg-buildconf.txt') -Encoding utf8
 Copy-Item -LiteralPath (Join-Path $repo 'docs/RELEASE-CHECKLIST.md') -Destination $publish
 Copy-Item -LiteralPath (Join-Path $repo 'docs') -Destination (Join-Path $publish 'docs') -Recurse
-foreach ($file in @('LICENSE.txt', 'THIRD-PARTY-NOTICES.TXT')) {
-    $runtimeFile = Get-ChildItem -Path (Join-Path $tools "nuget/packages/microsoft.netcore.app.runtime.win-x64/*/$file") -ErrorAction SilentlyContinue | Select-Object -Last 1
-    if ($runtimeFile) { Copy-Item -LiteralPath $runtimeFile.FullName -Destination (Join-Path $publish "licenses/dotnet-$file") }
-}
 # Include exact NuGet dependency inventory and any license/notice files shipped by packages.
 $assets = Get-Content (Join-Path $repo 'src/LumeFetch.Desktop/obj/project.assets.json') -Raw | ConvertFrom-Json
+foreach ($file in @('LICENSE.txt', 'THIRD-PARTY-NOTICES.TXT')) {
+    $runtimeFile = $null
+    foreach ($folder in $assets.packageFolders.PSObject.Properties.Name) {
+        $runtimeFile = Get-ChildItem -Path (Join-Path $folder "microsoft.netcore.app.runtime.win-x64/*/$file") -ErrorAction SilentlyContinue | Select-Object -Last 1
+        if ($runtimeFile) { break }
+    }
+    if (!$runtimeFile) { throw "Required .NET runtime notice missing: $file" }
+    Copy-Item -LiteralPath $runtimeFile.FullName -Destination (Join-Path $publish "licenses/dotnet-$file")
+}
 $inventory = foreach ($library in $assets.libraries.PSObject.Properties) {
     if ($library.Value.type -ne 'package') { continue }
     $packagePath = $null
@@ -80,6 +89,7 @@ $inventory = foreach ($library in $assets.libraries.PSObject.Properties) {
     }
 }
 $inventory | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $publish 'licenses/nuget-dependencies.json') -Encoding utf8
+& (Join-Path $PSScriptRoot 'Package-Sources.ps1') -Destination $artifacts -Version $Version -FFmpegDirectory $FFmpegDirectory
 if (!$SkipInstaller) {
     if (!$InnoCompiler) { $InnoCompiler = Join-Path $tools 'inno/ISCC.exe' }
     if (!(Test-Path -LiteralPath $InnoCompiler)) { throw 'Inno Setup compiler not found. Pass -InnoCompiler or run Get-WindowsTools.ps1 -IncludeInstallerCompiler.' }

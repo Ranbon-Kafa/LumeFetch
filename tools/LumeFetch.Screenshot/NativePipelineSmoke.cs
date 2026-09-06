@@ -20,7 +20,7 @@ internal static class NativePipelineSmoke
         var root = Environment.CurrentDirectory;
         var directory = Path.Combine(root, "artifacts", "pipeline-smoke", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
-        var ffmpegDirectory = Environment.GetEnvironmentVariable("LUMEFETCH_TEST_FFMPEG") ?? Path.Combine(root, ".tools", "ffmpeg");
+        var ffmpegDirectory = Environment.GetEnvironmentVariable("LUMEFETCH_TEST_FFMPEG") ?? Path.Combine(root, ".tools", "ffmpeg-lumefetch");
         var ffmpeg = new FFmpegService(Path.Combine(ffmpegDirectory, "ffmpeg.exe"));
         var clip = Path.Combine(directory, "clip.mp4");
         var video = Path.Combine(directory, "video.mp4");
@@ -33,6 +33,18 @@ internal static class NativePipelineSmoke
         await RunProcessAsync(ffmpeg.ExecutablePath!, ["-hide_banner", "-nostdin", "-n", "-i", clip, "-an", "-c:v", "copy", video]);
         await ffmpeg.MuxAsync(video, audio, muxed);
         var probe = Path.Combine(ffmpegDirectory, "ffprobe.exe");
+        var opus = Path.Combine(directory, "audio.opus");
+        await ffmpeg.ExtractAudioAsync(clip, opus, "libopus");
+        using (var info = JsonDocument.Parse(await RunProcessAsync(probe, ["-v", "error", "-show_streams", "-of", "json", opus])))
+            Program.Require(info.RootElement.GetProperty("streams")[0].GetProperty("codec_name").GetString() == "opus", "Native Opus encoder");
+        var cover = Path.Combine(directory, "cover.png");
+        await RunProcessAsync(ffmpeg.ExecutablePath!, ["-hide_banner", "-nostdin", "-n", "-i", clip, "-frames:v", "1", cover]);
+        var covered = Path.Combine(directory, "with-cover.mp3");
+        await RunProcessAsync(ffmpeg.ExecutablePath!, ["-hide_banner", "-nostdin", "-n", "-i", clip, "-i", cover,
+            "-map", "0:a:0", "-map", "1:v:0", "-c:a", "libmp3lame", "-c:v", "copy", "-disposition:v:0", "attached_pic", covered]);
+        using (var info = JsonDocument.Parse(await RunProcessAsync(probe, ["-v", "error", "-show_streams", "-of", "json", covered])))
+            Program.Require(info.RootElement.GetProperty("streams").EnumerateArray().Any(stream =>
+                stream.GetProperty("codec_name").GetString() == "png" && stream.GetProperty("disposition").GetProperty("attached_pic").GetInt32() == 1), "PNG cover embedding");
         using (var info = JsonDocument.Parse(await RunProcessAsync(probe, ["-v", "error", "-show_streams", "-of", "json", muxed])))
             Program.Require(info.RootElement.GetProperty("streams").GetArrayLength() == 2, "FFmpeg mux has video and audio");
 
@@ -75,7 +87,7 @@ internal static class NativePipelineSmoke
         await Program.UntilAsync(() => mp3Manager.Jobs[0].Status is DownloadStatus.Completed or DownloadStatus.Failed);
         Program.Require(mp3Manager.Jobs[0].Status == DownloadStatus.Completed, "Direct HTTP MP3 queue: " + mp3Manager.Jobs[0].ErrorMessage);
         await VerifyMp3Async(probe, mp3Manager.Jobs[0].OutputPath!, requireTitle: false);
-        Console.WriteLine("PASS: own test media, HTTP SHA-256, queue, yt-dlp progress, FFmpeg mux/M4A/MP3, direct-media MP3 and metadata.");
+        Console.WriteLine("PASS: own test media, HTTP SHA-256, queue, yt-dlp progress, FFmpeg mux/M4A/MP3/Opus/PNG cover, direct-media MP3 and metadata.");
         Console.WriteLine("Smoke outputs: " + directory);
     }
 

@@ -1,12 +1,15 @@
 # Changelog
 
-## Unreleased — v1 preparation
+## 1.0.0 — 2026-09-06
 
 - Graceful, localized recovery if the Windows clipboard or folder picker fails.
-- Reproducible source-build scripts for a smaller LGPL FFmpeg with MP3/Opus support.
+- Pinned-source build scripts for a smaller LGPL FFmpeg with MP3/Opus/PNG support.
 - Exact source and license collection for bundled third-party tools.
 - Isolated Windows installer/upgrade/uninstall and portable acceptance workflow.
-- Live Spotify metadata and YouTube matching verified with maintainer sign-in.
+- Spotify is disabled in the distributed app, with maintainer approval, pending
+  service-policy review. Experimental code/tests are retained for future assessment.
+- All media tools bundled; no first-launch dependency downloads. Packages are unsigned.
+- Source archives, build recipes, upstream notices/declarations and hashes accompany binaries.
 
 ## 0.2.1 — MP3 / initial public source preview
 

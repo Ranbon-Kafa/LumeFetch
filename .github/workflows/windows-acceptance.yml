@@ -18,6 +18,15 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .tools/ffmpeg-lumefetch
+            .tools/licenses/native-build
+          key: lumefetch-ffmpeg-win-x64-${{ hashFiles('scripts/Build-FFmpeg.ps1', 'scripts/build-ffmpeg.sh') }}
       - uses: msys2/setup-msys2@v2
         id: msys2
         with:
@@ -30,7 +39,12 @@ jobs:
           LUMEFETCH_MSYS_ROOT: ${{ steps.msys2.outputs.msys2-location }}
         run: |
           ./scripts/Get-WindowsTools.ps1 -IncludeInstallerCompiler -SkipFFmpeg
-          ./scripts/Build-FFmpeg.ps1 -MsysRoot $env:LUMEFETCH_MSYS_ROOT -Jobs 4
+          if (!(Test-Path .tools/ffmpeg-lumefetch/ffmpeg.exe)) {
+            ./scripts/Build-FFmpeg.ps1 -MsysRoot $env:LUMEFETCH_MSYS_ROOT -Jobs 4
+          }
+      - name: Collect exact sources and third-party notices
+        shell: pwsh
+        run: python scripts/collect-third-party.py
       - name: Unit and native media acceptance
         shell: pwsh
         run: |
@@ -44,4 +58,17 @@ jobs:
           ./scripts/Publish-Windows.ps1 -Version 1.0.0 -FFmpegDirectory "$pwd/.tools/ffmpeg-lumefetch"
           $package = Get-ChildItem artifacts/releases -Directory -Filter '1.0.0-*' | Select-Object -Last 1
           ./scripts/Test-WindowsPackage.ps1 -PreviousInstaller $oldInstaller -Installer "$($package.FullName)/LumeFetch-1.0.0-win-x64-setup.exe" -Portable "$($package.FullName)/LumeFetch-1.0.0-win-x64-portable.zip"
-      # Acceptance only. No binary upload or public release until source/notice review is complete.
+      - name: Stage verified release artifacts
+        shell: pwsh
+        run: |
+          $package = Get-ChildItem artifacts/releases -Directory -Filter '1.0.0-*' | Select-Object -Last 1
+          New-Item -ItemType Directory -Path artifacts/verified-release | Out-Null
+          Get-ChildItem -LiteralPath $package.FullName -File | Copy-Item -Destination artifacts/verified-release
+          git rev-parse HEAD | Set-Content artifacts/verified-release/COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lumefetch-v1-verified-windows
+          path: artifacts/verified-release/*
+          if-no-files-found: error
+          retention-days: 14
+      # Publishing the GitHub Release is a separate maintainer action after reviewing this run.
