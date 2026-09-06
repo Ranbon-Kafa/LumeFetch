@@ -16,7 +16,10 @@
 - [x] Document unsigned status and supported/unsupported scope.
 - [x] Inspect final v1 acceptance run 34041489913 and downloaded asset checksums. Tested
   commit: `194d5922344d70bbb4b50d76e432c4f4e1af6673`. All bundled tool and source hashes match.
-- [ ] Publish installer, portable ZIP, corresponding sources, SHA256SUMS and release notes together.
+- [x] Published installer, portable ZIP, corresponding sources, SHA256SUMS and release notes
+  together as [v1.0.0](https://github.com/Ranbon-Kafa/LumeFetch/releases/tag/v1.0.0)
+  on 2026-09-06. GitHub's hashes match the verified artifacts; release is public,
+  non-prerelease and marked latest. Packages remain explicitly unsigned.
 
 ## Explicitly unverified / deferred
 

@@ -2,6 +2,11 @@
 
 ## v1 preparation — 2026-09-06
 
+- v1.0.0 published at 2026-09-06 20:59:13 UTC with all four assets. Server-side
+  upload run 34059558289 verified the same artifact contents; GitHub's asset
+  digests match the independently checked local SHA-256 values. Public release:
+  https://github.com/Ranbon-Kafa/LumeFetch/releases/tag/v1.0.0.
+
 - Final packaged v1 acceptance passed:
   https://github.com/Ranbon-Kafa/LumeFetch/actions/runs/34041489913, commit
   `194d5922344d70bbb4b50d76e432c4f4e1af6673` (tag `v1.0.0`). Installer, portable
