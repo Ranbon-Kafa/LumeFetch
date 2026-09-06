@@ -20,7 +20,8 @@ internal static class NativePipelineSmoke
         var root = Environment.CurrentDirectory;
         var directory = Path.Combine(root, "artifacts", "pipeline-smoke", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
-        var ffmpeg = new FFmpegService(Path.Combine(root, ".tools", "ffmpeg", "ffmpeg.exe"));
+        var ffmpegDirectory = Environment.GetEnvironmentVariable("LUMEFETCH_TEST_FFMPEG") ?? Path.Combine(root, ".tools", "ffmpeg");
+        var ffmpeg = new FFmpegService(Path.Combine(ffmpegDirectory, "ffmpeg.exe"));
         var clip = Path.Combine(directory, "clip.mp4");
         var video = Path.Combine(directory, "video.mp4");
         var audio = Path.Combine(directory, "audio.m4a");
@@ -31,7 +32,7 @@ internal static class NativePipelineSmoke
         await ffmpeg.ExtractAudioAsync(clip, audio, "aac");
         await RunProcessAsync(ffmpeg.ExecutablePath!, ["-hide_banner", "-nostdin", "-n", "-i", clip, "-an", "-c:v", "copy", video]);
         await ffmpeg.MuxAsync(video, audio, muxed);
-        var probe = Path.Combine(root, ".tools", "ffmpeg", "ffprobe.exe");
+        var probe = Path.Combine(ffmpegDirectory, "ffprobe.exe");
         using (var info = JsonDocument.Parse(await RunProcessAsync(probe, ["-v", "error", "-show_streams", "-of", "json", muxed])))
             Program.Require(info.RootElement.GetProperty("streams").GetArrayLength() == 2, "FFmpeg mux has video and audio");
 

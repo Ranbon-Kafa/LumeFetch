@@ -161,6 +161,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         return AnalyzeAsync();
     }
 
+    public void ReportPlatformFailure(string messageKey) => ErrorMessage = Localizer.Current[messageKey];
+
     public async Task ShutdownAsync()
     {
         Dispose();

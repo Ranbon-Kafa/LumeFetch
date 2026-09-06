@@ -50,11 +50,12 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var text = await clipboard.TryGetTextAsync();
-        if (!string.IsNullOrWhiteSpace(text))
+        try
         {
-            await viewModel.AnalyzeFromPasteAsync(text);
+            var text = await clipboard.TryGetTextAsync();
+            if (!string.IsNullOrWhiteSpace(text)) await viewModel.AnalyzeFromPasteAsync(text);
         }
+        catch (Exception) { viewModel.ReportPlatformFailure("ClipboardFailed"); }
     }
 
     private async void BrowseButton_OnClick(object? sender, RoutedEventArgs e)
@@ -65,17 +66,17 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        try
         {
-            Title = Localizer.Current["ChooseFolder"],
-            AllowMultiple = false,
-        });
-
-        var selectedPath = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
-        if (!string.IsNullOrWhiteSpace(selectedPath))
-        {
-            viewModel.DestinationDirectory = selectedPath;
+            var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = Localizer.Current["ChooseFolder"],
+                AllowMultiple = false,
+            });
+            var selectedPath = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
+            if (!string.IsNullOrWhiteSpace(selectedPath)) viewModel.DestinationDirectory = selectedPath;
         }
+        catch (Exception) { viewModel.ReportPlatformFailure("FolderPickerFailed"); }
     }
 
     private async void ConnectSpotifyButton_OnClick(object? sender, RoutedEventArgs e)

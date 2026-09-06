@@ -2,6 +2,7 @@ param(
     [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '0.2.1',
     [string]$Dotnet = 'dotnet',
     [string]$InnoCompiler,
+    [string]$FFmpegDirectory,
     [switch]$SkipInstaller,
     [switch]$NoRestore
 )
@@ -10,12 +11,17 @@ $env:AVALONIA_TELEMETRY_OPTOUT = '1'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 $repo = Split-Path $PSScriptRoot -Parent
 $tools = Join-Path $repo '.tools'
+if (!$FFmpegDirectory) { $FFmpegDirectory = Join-Path $tools 'ffmpeg' }
+$FFmpegDirectory = [IO.Path]::GetFullPath($FFmpegDirectory)
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $artifacts = Join-Path $repo "artifacts/releases/$Version-$stamp"
 $publish = Join-Path $artifacts 'app'
 New-Item -ItemType Directory -Path $publish -Force | Out-Null
-foreach ($tool in @('ffmpeg/ffmpeg.exe','ffmpeg/ffprobe.exe','yt-dlp/yt-dlp.exe','deno/deno.exe')) {
+foreach ($tool in @('yt-dlp/yt-dlp.exe','deno/deno.exe')) {
     if (!(Test-Path -LiteralPath (Join-Path $tools $tool))) { throw "Missing $tool. Run scripts/Get-WindowsTools.ps1 first." }
+}
+foreach ($file in @('ffmpeg.exe', 'ffprobe.exe', 'LICENSE.txt')) {
+    if (!(Test-Path -LiteralPath (Join-Path $FFmpegDirectory $file))) { throw "Missing FFmpeg file: $file" }
 }
 [string[]]$restoreArguments = @()
 if ($NoRestore) { $restoreArguments += '--no-restore' }
@@ -33,8 +39,8 @@ foreach ($tool in @('yt-dlp', 'deno', 'ffmpeg')) {
     $target = Join-Path $publish "tools/$tool"
     New-Item -ItemType Directory -Path $target -Force | Out-Null
     if ($tool -eq 'ffmpeg') {
-        Copy-Item -Path (Join-Path $tools 'ffmpeg/*.dll') -Destination $target
-        foreach ($file in @('ffmpeg.exe','ffprobe.exe','LICENSE.txt')) { Copy-Item -LiteralPath (Join-Path $tools "ffmpeg/$file") -Destination $target }
+        Copy-Item -Path (Join-Path $FFmpegDirectory '*.dll') -Destination $target
+        foreach ($file in @('ffmpeg.exe','ffprobe.exe','LICENSE.txt')) { Copy-Item -LiteralPath (Join-Path $FFmpegDirectory $file) -Destination $target }
     } else { Copy-Item -LiteralPath (Join-Path $tools "$tool/$tool.exe") -Destination $target }
 }
 Copy-Item -LiteralPath (Join-Path $tools 'licenses') -Destination (Join-Path $publish 'licenses') -Recurse
@@ -42,6 +48,11 @@ foreach ($file in @('LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'CHANGELOG
     Copy-Item -LiteralPath (Join-Path $repo $file) -Destination $publish
 }
 Copy-Item -LiteralPath (Join-Path $repo 'packaging/windows/dependencies.json') -Destination $publish
+$binaryInventory = Get-ChildItem -LiteralPath (Join-Path $publish 'tools') -Recurse -File | ForEach-Object {
+    [pscustomobject]@{ File = [IO.Path]::GetRelativePath($publish, $_.FullName).Replace('\', '/'); SHA256 = (Get-FileHash -LiteralPath $_.FullName).Hash.ToLowerInvariant() }
+}
+$binaryInventory | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $publish 'licenses/tool-binaries.json') -Encoding utf8
+& (Join-Path $FFmpegDirectory 'ffmpeg.exe') -hide_banner -buildconf 2>&1 | Set-Content -LiteralPath (Join-Path $publish 'licenses/ffmpeg-buildconf.txt') -Encoding utf8
 Copy-Item -LiteralPath (Join-Path $repo 'docs/RELEASE-CHECKLIST.md') -Destination $publish
 Copy-Item -LiteralPath (Join-Path $repo 'docs') -Destination (Join-Path $publish 'docs') -Recurse
 foreach ($file in @('LICENSE.txt', 'THIRD-PARTY-NOTICES.TXT')) {
@@ -52,7 +63,12 @@ foreach ($file in @('LICENSE.txt', 'THIRD-PARTY-NOTICES.TXT')) {
 $assets = Get-Content (Join-Path $repo 'src/LumeFetch.Desktop/obj/project.assets.json') -Raw | ConvertFrom-Json
 $inventory = foreach ($library in $assets.libraries.PSObject.Properties) {
     if ($library.Value.type -ne 'package') { continue }
-    $packagePath = Join-Path $tools ('nuget/packages/' + $library.Value.path)
+    $packagePath = $null
+    foreach ($folder in $assets.packageFolders.PSObject.Properties.Name) {
+        $candidate = Join-Path $folder $library.Value.path
+        if (Test-Path -LiteralPath $candidate) { $packagePath = $candidate; break }
+    }
+    if (!$packagePath) { throw "Cannot inventory package: $($library.Name)" }
     $spec = Get-ChildItem -LiteralPath $packagePath -Filter '*.nuspec' | Select-Object -First 1
     if (!$spec) { continue }
     [xml]$xml = Get-Content -LiteralPath $spec.FullName -Raw

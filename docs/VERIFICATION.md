@@ -1,5 +1,26 @@
 # Verification record — 2026-09-05
 
+## v1 preparation — 2026-09-06
+
+- Native Windows application opened; navigation and URL controls exposed an
+  accessibility tree. The real Windows folder picker opened successfully.
+  This does not constitute a full screen-reader/high-DPI audit.
+- Maintainer completed Spotify sign-in manually. In that live session, the app
+  retrieved Rick Astley's "Never Gonna Give You Up" title/artist/album from Spotify,
+  then found a YouTube candidate scoring 100/100. Permission remained unchecked
+  and the queue action remained disabled. No media was downloaded in this test.
+- Native text entry triggered Smart Paste analysis. Clipboard-button acceptance
+  is separate and is not inferred from typing a URL.
+- Release build and all 76 unit cases passed after adding localized handling
+  for clipboard and folder-picker failures.
+- Source-built FFmpeg 9.0.1 with LAME/Opus is being prepared to replace the
+  preview's larger third-party build. Exact source archives and original notices
+  are being collected. Collection success alone is not legal certification.
+- `Windows release acceptance` tests source-built tools, the real media pipeline,
+  installer upgrade, portable extraction and uninstall on a disposable hosted
+  Windows worker. Its result must be inspected, not assumed from this document.
+- ruzgarefe.com deployment is explicitly excluded at the maintainer's request.
+
 ## Automated checks
 
 - Release compilation with warnings treated as errors.

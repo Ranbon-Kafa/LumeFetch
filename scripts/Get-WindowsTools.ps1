@@ -1,4 +1,4 @@
-param([switch]$IncludeInstallerCompiler)
+param([switch]$IncludeInstallerCompiler, [switch]$SkipFFmpeg)
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 $repo = Split-Path $PSScriptRoot -Parent
@@ -6,6 +6,7 @@ $toolRoot = Join-Path $repo '.tools'
 $manifest = Get-Content (Join-Path $repo 'packaging/windows/dependencies.json') -Raw | ConvertFrom-Json
 New-Item -ItemType Directory -Force -Path (Join-Path $toolRoot 'archives') | Out-Null
 foreach ($name in @('yt-dlp', 'ffmpeg', 'deno', 'inno')) {
+    if ($name -eq 'ffmpeg' -and $SkipFFmpeg) { continue }
     if ($name -eq 'inno' -and !$IncludeInstallerCompiler) { continue }
     $dependency = $manifest.$name
     $extension = if ($name -in @('yt-dlp', 'inno')) { '.exe' } else { '.zip' }

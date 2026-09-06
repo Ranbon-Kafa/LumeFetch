@@ -1,4 +1,6 @@
 {
+  "ClipboardFailed": "Pano okunamadı. Bağlantıyı adres alanına Ctrl+V ile yapıştırabilirsin.",
+  "FolderPickerFailed": "Klasör seçici açılamadı. Ayarlar bölümünden kayıt klasörünün tam yolunu girebilirsin.",
   "OpenSource": "Kaynağı aç",
   "Home": "⌂   Ana sayfa",
   "NavDownloads": "↓   İndirmeler",

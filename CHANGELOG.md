@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — v1 preparation
+
+- Graceful, localized recovery if the Windows clipboard or folder picker fails.
+- Reproducible source-build scripts for a smaller LGPL FFmpeg with MP3/Opus support.
+- Exact source and license collection for bundled third-party tools.
+- Isolated Windows installer/upgrade/uninstall and portable acceptance workflow.
+- Live Spotify metadata and YouTube matching verified with maintainer sign-in.
+
 ## 0.2.1 — MP3 / initial public source preview
 
 - MP3 options for supported platform media, with real FFmpeg encoding.

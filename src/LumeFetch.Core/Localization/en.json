@@ -1,4 +1,6 @@
 {
+  "ClipboardFailed": "The clipboard could not be read. Paste the URL into the address field using Ctrl+V.",
+  "FolderPickerFailed": "The folder picker could not be opened. Enter the full save folder in Settings.",
   "OpenSource": "View source",
   "Home": "⌂   Home",
   "NavDownloads": "↓   Downloads",

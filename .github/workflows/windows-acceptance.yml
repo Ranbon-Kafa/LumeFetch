@@ -1,0 +1,47 @@
+name: Windows release acceptance
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AVALONIA_TELEMETRY_OPTOUT: '1'
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+
+jobs:
+  acceptance:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: msys2/setup-msys2@v2
+        id: msys2
+        with:
+          msystem: MINGW64
+          update: true
+          install: make mingw-w64-x86_64-gcc mingw-w64-x86_64-pkgconf
+      - name: Verify tools and build FFmpeg from pinned sources
+        shell: pwsh
+        env:
+          LUMEFETCH_MSYS_ROOT: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          ./scripts/Get-WindowsTools.ps1 -IncludeInstallerCompiler -SkipFFmpeg
+          ./scripts/Build-FFmpeg.ps1 -MsysRoot $env:LUMEFETCH_MSYS_ROOT -Jobs 4
+      - name: Unit and native media acceptance
+        shell: pwsh
+        run: |
+          $env:LUMEFETCH_TEST_FFMPEG = "$pwd/.tools/ffmpeg-lumefetch"
+          ./scripts/Test.ps1 -IncludeMediaSmoke
+      - name: Installer and portable acceptance
+        shell: pwsh
+        run: |
+          ./scripts/Publish-Windows.ps1 -Version 0.2.1 -FFmpegDirectory "$pwd/.tools/ffmpeg-lumefetch"
+          $oldInstaller = (Get-ChildItem artifacts/releases -Filter '*-setup.exe' -Recurse | Select-Object -Last 1).FullName
+          ./scripts/Publish-Windows.ps1 -Version 1.0.0 -FFmpegDirectory "$pwd/.tools/ffmpeg-lumefetch"
+          $package = Get-ChildItem artifacts/releases -Directory -Filter '1.0.0-*' | Select-Object -Last 1
+          ./scripts/Test-WindowsPackage.ps1 -PreviousInstaller $oldInstaller -Installer "$($package.FullName)/LumeFetch-1.0.0-win-x64-setup.exe" -Portable "$($package.FullName)/LumeFetch-1.0.0-win-x64-portable.zip"
+      # Acceptance only. No binary upload or public release until source/notice review is complete.
