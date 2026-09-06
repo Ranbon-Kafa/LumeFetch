@@ -65,6 +65,9 @@ jobs:
           New-Item -ItemType Directory -Path artifacts/verified-release | Out-Null
           Get-ChildItem -LiteralPath $package.FullName -File | Copy-Item -Destination artifacts/verified-release
           git rev-parse HEAD | Set-Content artifacts/verified-release/COMMIT.txt
+      - name: Verify release archives and exact source hashes
+        shell: pwsh
+        run: ./scripts/Verify-ReleaseAssets.ps1 -Directory artifacts/verified-release -Commit (git rev-parse HEAD)
       - uses: actions/upload-artifact@v4
         with:
           name: lumefetch-v1-verified-windows

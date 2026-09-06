@@ -2,6 +2,16 @@
 
 ## v1 preparation — 2026-09-06
 
+- Final packaged v1 acceptance passed:
+  https://github.com/Ranbon-Kafa/LumeFetch/actions/runs/34041489913, commit
+  `194d5922344d70bbb4b50d76e432c4f4e1af6673` (tag `v1.0.0`). Installer, portable
+  and corresponding-source archives downloaded from that run match SHA256SUMS.
+  Every bundled tool and all 1,079 source archive/input hashes were rechecked.
+  Required .NET/font notices, portable marker and source recipes are present;
+  portable contains no local settings, credential files or private build path.
+  Run `scripts/Verify-ReleaseAssets.ps1 -Directory <downloaded-artifacts> -Commit
+  194d5922344d70bbb4b50d76e432c4f4e1af6673` to repeat the read-only archive checks.
+
 - Native Windows application opened; navigation and URL controls exposed an
   accessibility tree. The real Windows folder picker opened successfully.
   This does not constitute a full screen-reader/high-DPI audit.

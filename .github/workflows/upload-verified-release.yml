@@ -1,0 +1,80 @@
+name: Upload verified release files
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful Windows acceptance run containing the verified artifact
+        required: true
+        default: '34041489913'
+      commit:
+        description: Exact tested 40-character source commit
+        required: true
+        default: '194d5922344d70bbb4b50d76e432c4f4e1af6673'
+      version:
+        description: Existing draft release version (without v)
+        required: true
+        default: '1.0.0'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency: upload-verified-release
+
+jobs:
+  upload:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      ACCEPTANCE_RUN: ${{ inputs.run_id }}
+      TESTED_COMMIT: ${{ inputs.commit }}
+      RELEASE_VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve and verify tested files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:ACCEPTANCE_RUN -notmatch '^\d+$' -or $env:RELEASE_VERSION -notmatch '^\d+\.\d+\.\d+$' -or $env:TESTED_COMMIT -notmatch '^[a-f0-9]{40}$') { throw 'Invalid release inputs.' }
+          $run = gh run view $env:ACCEPTANCE_RUN --json conclusion,headSha | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0 -or $run.conclusion -ne 'success' -or $run.headSha -ne $env:TESTED_COMMIT) { throw 'Acceptance run is not successful for this source commit.' }
+          gh run download $env:ACCEPTANCE_RUN --name lumefetch-v1-verified-windows --dir artifacts/verified-release
+          if ($LASTEXITCODE -ne 0) { throw 'Artifact download failed.' }
+          ./scripts/Verify-ReleaseAssets.ps1 -Directory artifacts/verified-release -Commit $env:TESTED_COMMIT -Version $env:RELEASE_VERSION
+      - name: Upload only missing files to the existing draft
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tag = 'v' + $env:RELEASE_VERSION
+          $tagCommit = gh api "repos/$env:GH_REPO/commits/$tag" --jq .sha
+          if ($LASTEXITCODE -ne 0 -or $tagCommit -ne $env:TESTED_COMMIT) { throw 'Release tag is not the tested commit.' }
+          $releases = gh api "repos/$env:GH_REPO/releases" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect releases.' }
+          $matching = @($releases | Where-Object tag_name -eq $tag)
+          if ($matching.Count -ne 1 -or !$matching[0].draft) { throw 'Expected one existing draft; published releases are immutable here.' }
+          $release = $matching[0]
+          $files = @("LumeFetch-$env:RELEASE_VERSION-win-x64-setup.exe", "LumeFetch-$env:RELEASE_VERSION-win-x64-portable.zip", "LumeFetch-$env:RELEASE_VERSION-corresponding-sources.zip", 'SHA256SUMS.txt')
+          foreach ($name in $files) {
+            $path = Join-Path artifacts/verified-release $name
+            $expected = 'sha256:' + (Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()
+            $existing = @($release.assets | Where-Object name -eq $name)
+            if ($existing.Count) {
+              if ($existing.Count -ne 1 -or $existing[0].state -ne 'uploaded' -or $existing[0].digest -ne $expected) { throw "Existing asset differs: $name. Nothing overwritten." }
+              Write-Host "Already verified: $name"
+              continue
+            }
+            gh release upload $tag $path
+            if ($LASTEXITCODE -ne 0) { throw "Upload failed: $name" }
+            Write-Host "Uploaded: $name"
+          }
+          $final = gh api "repos/$env:GH_REPO/releases/$($release.id)" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0 -or !$final.draft) { throw 'Cannot verify draft after upload.' }
+          foreach ($name in $files) {
+            $asset = @($final.assets | Where-Object name -eq $name)
+            $expected = 'sha256:' + (Get-FileHash -LiteralPath (Join-Path artifacts/verified-release $name)).Hash.ToLowerInvariant()
+            if ($asset.Count -ne 1 -or $asset[0].state -ne 'uploaded' -or $asset[0].digest -ne $expected) { throw "Remote hash mismatch: $name" }
+          }
+          Write-Host 'PASS: all four release files match verified artifacts. Release remains a draft for final publication.'

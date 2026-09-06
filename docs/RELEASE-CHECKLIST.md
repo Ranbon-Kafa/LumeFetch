@@ -14,7 +14,8 @@
   See CORRESPONDING-SOURCES.md; this inventory is not a legal opinion.
 - [x] Disable Spotify registration/authentication/URL resolution in v1, approved by maintainer.
 - [x] Document unsigned status and supported/unsupported scope.
-- [ ] Inspect the final v1 build's acceptance result and downloaded asset checksums before publishing.
+- [x] Inspect final v1 acceptance run 34041489913 and downloaded asset checksums. Tested
+  commit: `194d5922344d70bbb4b50d76e432c4f4e1af6673`. All bundled tool and source hashes match.
 - [ ] Publish installer, portable ZIP, corresponding sources, SHA256SUMS and release notes together.
 
 ## Explicitly unverified / deferred
