@@ -6,9 +6,14 @@ namespace LumeFetch.Infrastructure.Processing;
 
 public sealed class FFmpegService : IFFmpegService
 {
-    public FFmpegService(string? executablePath = null)
+    private readonly ToolCommand? _command;
+    private readonly ToolCommand? _probeCommand;
+
+    public FFmpegService(string? executablePath = null, ToolCommand? command = null, ToolCommand? probeCommand = null)
     {
-        ExecutablePath = executablePath ?? ExternalToolLocator.Find("ffmpeg", Path.Combine(Environment.CurrentDirectory, ".tools", "ffmpeg-lumefetch"));
+        ExecutablePath = command?.ExecutablePath ?? executablePath ?? ExternalToolLocator.Find("ffmpeg", Path.Combine(Environment.CurrentDirectory, ".tools", "ffmpeg-lumefetch"));
+        _command = command ?? (ExecutablePath is null ? null : new ToolCommand(ExecutablePath));
+        _probeCommand = probeCommand;
     }
 
     public string? ExecutablePath { get; }
@@ -23,9 +28,13 @@ public sealed class FFmpegService : IFFmpegService
         }
 
         var result = await RunAsync(["-version"], cancellationToken).ConfigureAwait(false);
-        return result.StandardOutput
-            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-            .FirstOrDefault();
+        var version = ReadVersion(result.StandardOutput, "ffmpeg");
+        if (_probeCommand is not null)
+        {
+            var probe = await RunAsync(["-version"], cancellationToken, _probeCommand, "FFprobe").ConfigureAwait(false);
+            version += "\n" + ReadVersion(probe.StandardOutput, "ffprobe");
+        }
+        return version;
     }
 
     public async Task MuxAsync(
@@ -60,31 +69,27 @@ public sealed class FFmpegService : IFFmpegService
 
     private async Task<ProcessResult> RunAsync(
         IReadOnlyList<string> arguments,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        ToolCommand? command = null,
+        string toolName = "FFmpeg")
     {
-        if (ExecutablePath is null)
+        command ??= _command;
+        if (command is null)
         {
             throw new FileNotFoundException(
                 "FFmpeg was not found. Add it to PATH or place it in the application's tools/ffmpeg directory.");
         }
 
-        var startInfo = new ProcessStartInfo(ExecutablePath)
-        {
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-        };
-
-        foreach (var argument in arguments)
-        {
-            startInfo.ArgumentList.Add(argument);
-        }
+        var startInfo = command.CreateStartInfo(arguments);
 
         using var process = new Process { StartInfo = startInfo };
-        if (!process.Start())
+        try
         {
-            throw new InvalidOperationException("FFmpeg could not be started.");
+            if (!process.Start()) throw new InvalidOperationException("Process.Start returned false.");
+        }
+        catch (Exception exception) when (exception is System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            throw new InvalidOperationException($"{toolName} could not start: {exception.Message}", exception);
         }
 
         var standardOutputTask = process.StandardOutput.ReadToEndAsync(CancellationToken.None);
@@ -98,7 +103,7 @@ public sealed class FFmpegService : IFFmpegService
         {
             if (!process.HasExited)
             {
-                process.Kill(entireProcessTree: true);
+                command.Terminate(process);
                 await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
             }
 
@@ -113,7 +118,7 @@ public sealed class FFmpegService : IFFmpegService
 
         if (result.ExitCode != 0)
         {
-            throw new InvalidOperationException($"FFmpeg failed: {LastUsefulLine(result.StandardError)}");
+            throw new InvalidOperationException($"{toolName} exited with code {result.ExitCode}: {ErrorDetails(result.StandardError)}");
         }
 
         return result;
@@ -136,9 +141,18 @@ public sealed class FFmpegService : IFFmpegService
         }
     }
 
-    private static string LastUsefulLine(string value) => value
+    private static string ReadVersion(string output, string name) => output
         .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .LastOrDefault() ?? "Unknown process error.";
+        .FirstOrDefault(line => line.StartsWith(name + " version ", StringComparison.OrdinalIgnoreCase))
+        ?? throw new InvalidOperationException($"{name} returned no recognizable version information.");
+
+    private static string ErrorDetails(string value)
+    {
+        // Linker errors can span several lines. Keep the exit code even if a native crash produced no stderr.
+        var details = string.Join("\n", value.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).TakeLast(8));
+        if (details.Length == 0) return "No error output was produced.";
+        return details.Length > 2000 ? details[^2000..] : details;
+    }
 
     private sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError);
 }

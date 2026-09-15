@@ -21,6 +21,8 @@ public sealed class TranslationCatalog
     {
         using var stream = typeof(TranslationCatalog).Assembly.GetManifestResourceStream("LumeFetch.Core.Localization." + language + ".json")
             ?? throw new InvalidOperationException("Missing translation resource.");
-        return JsonSerializer.Deserialize<Dictionary<string, string>>(stream) ?? [];
+        using var document = JsonDocument.Parse(stream);
+        return document.RootElement.EnumerateObject().ToDictionary(entry => entry.Name,
+            entry => entry.Value.GetString() ?? string.Empty, StringComparer.Ordinal);
     }
 }

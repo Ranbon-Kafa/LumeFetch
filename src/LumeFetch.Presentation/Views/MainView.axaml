@@ -1,0 +1,426 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:loc="clr-namespace:LumeFetch.Presentation.Localization"
+             xmlns:ui="clr-namespace:LumeFetch.Presentation.Controls"
+             xmlns:vm="clr-namespace:LumeFetch.Presentation.ViewModels"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LumeFetch.Presentation.Views.MainView"
+             x:DataType="vm:MainWindowViewModel"
+             Classes="lumefetch">
+  <UserControl.Styles>
+    <Style Selector="StackPanel.page"><Setter Property="Margin" Value="44,32,44,52" /></Style>
+    <Style Selector="TextBlock.pageTitle"><Setter Property="FontSize" Value="29" /></Style>
+    <Style Selector="Border.padding24"><Setter Property="Padding" Value="24" /></Style>
+    <Style Selector="Border.padding22"><Setter Property="Padding" Value="22" /></Style>
+    <Style Selector="Border.padding26"><Setter Property="Padding" Value="26" /></Style>
+    <Style Selector="Border.padding18"><Setter Property="Padding" Value="18" /></Style>
+    <Style Selector=".compact StackPanel.page">
+      <Setter Property="Margin" Value="14,16,14,28" />
+    </Style>
+    <Style Selector=".compact Border.card">
+      <Setter Property="Padding" Value="14" />
+    </Style>
+    <Style Selector=".compact Button">
+      <Setter Property="MinHeight" Value="44" />
+    </Style>
+    <Style Selector=".compact Button.nav">
+      <Setter Property="Padding" Value="6,10" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector=".compact TextBlock">
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector=".compact TextBlock.pageTitle">
+      <Setter Property="FontSize" Value="24" />
+    </Style>
+  </UserControl.Styles>
+  <Grid x:Name="Shell" ColumnDefinitions="228,*" RowDefinitions="Auto,*">
+    <Border x:Name="Sidebar" Grid.Column="0" Grid.RowSpan="2"
+            Background="#0C121B"
+            BorderBrush="#1B2532"
+            BorderThickness="0,0,1,0"
+            Padding="20,24">
+      <Grid RowDefinitions="Auto,40,*,Auto">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="11">
+          <Image Width="38" Height="38" Source="avares://LumeFetch.Presentation/Assets/lumefetch-logo.png" />
+          <StackPanel VerticalAlignment="Center" Spacing="1">
+            <TextBlock Text="LumeFetch" FontSize="17" FontWeight="Bold" />
+            <TextBlock Text="{loc:Loc OpenSourceBrand}" FontSize="9" FontWeight="SemiBold" Foreground="#6EE7B7" />
+          </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Spacing="7">
+          <Button Classes="nav" Content="{loc:Loc Home}" Command="{Binding ShowHomeCommand}" />
+          <Button Classes="nav" Content="{loc:Loc NavDownloads}" Click="DownloadsButton_OnClick" />
+          <Button Classes="nav" Content="{loc:Loc NavSettings}" Command="{Binding ShowSettingsCommand}" />
+        </StackPanel>
+
+        <Border Grid.Row="3"
+                Background="#101925"
+                BorderBrush="#202D3B"
+                BorderThickness="1"
+                CornerRadius="13"
+                Padding="13">
+          <StackPanel Spacing="6">
+            <StackPanel Orientation="Horizontal" Spacing="7">
+              <Ellipse Width="7" Height="7" Fill="#6EE7B7" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding FfmpegStatus}" FontSize="11" Foreground="#B7C2D0" />
+            </StackPanel>
+            <TextBlock Text="{Binding VersionLabel}" FontSize="10" Classes="muted" />
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Border>
+
+    <Border x:Name="MobileNavigation" Grid.Row="0" Grid.ColumnSpan="2" IsVisible="False"
+            Background="#0C121B" BorderBrush="#1B2532" BorderThickness="0,0,0,1" Padding="14,12">
+      <StackPanel Spacing="10">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+          <Image Width="32" Height="32" Source="avares://LumeFetch.Presentation/Assets/lumefetch-logo.png" />
+          <StackPanel Grid.Column="1">
+            <TextBlock Text="LumeFetch" FontSize="17" FontWeight="Bold" />
+            <TextBlock Text="{loc:Loc OpenSourceBrand}" Foreground="#6EE7B7" FontSize="9" />
+          </StackPanel>
+          <StackPanel Grid.Column="2" VerticalAlignment="Center">
+            <TextBlock Text="{Binding FfmpegStatus}" Classes="muted" FontSize="10" />
+            <TextBlock Text="{Binding VersionLabel}" Classes="muted" FontSize="9" />
+          </StackPanel>
+        </Grid>
+        <UniformGrid Columns="3">
+          <Button Classes="nav" Content="{loc:Loc Home}" Command="{Binding ShowHomeCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+          <Button Classes="nav" Content="{loc:Loc NavDownloads}" Click="DownloadsButton_OnClick" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+          <Button Classes="nav" Content="{loc:Loc NavSettings}" Command="{Binding ShowSettingsCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        </UniformGrid>
+      </StackPanel>
+    </Border>
+    <ScrollViewer x:Name="SettingsScrollView" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding IsSettingsOpen}">
+      <StackPanel Classes="page" Spacing="24" MaxWidth="1040">
+        <StackPanel Spacing="6">
+          <TextBlock Text="{loc:Loc SettingsTitle}" Classes="pageTitle" FontWeight="Bold" />
+          <TextBlock Text="{loc:Loc SettingsSubtitle}" Classes="muted" />
+        </StackPanel>
+        <Border Classes="card padding24">
+          <StackPanel Spacing="15">
+            <TextBlock Text="{loc:Loc Downloads}" FontSize="19" FontWeight="SemiBold" />
+            <TextBlock Text="{loc:Loc DefaultFolder}" Classes="muted" />
+            <ui:AdaptiveGrid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+              <TextBox Text="{Binding DestinationLabel, Mode=TwoWay}" IsReadOnly="{Binding UsesPlatformFolders}" />
+              <Button Grid.Column="1" Classes="ghost" Content="{loc:Loc Browse}" Click="BrowseButton_OnClick" />
+            </ui:AdaptiveGrid>
+            <Grid ColumnDefinitions="*,100">
+              <TextBlock Text="{loc:Loc ParallelSetting}" VerticalAlignment="Center" />
+              <NumericUpDown Grid.Column="1" Minimum="1" Maximum="6" Increment="1" FormatString="0"
+                             Value="{Binding ParallelDownloads, Mode=TwoWay}" />
+            </Grid>
+            <CheckBox Content="{loc:Loc SmartPasteSetting}" IsChecked="{Binding SmartPaste, Mode=TwoWay}" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card padding24">
+          <StackPanel Spacing="13">
+            <TextBlock Text="{loc:Loc Tools}" FontSize="19" FontWeight="SemiBold" />
+            <TextBlock Text="{loc:Loc ToolsHelp}"
+                       TextWrapping="Wrap" Classes="muted" FontSize="12" />
+            <TextBlock Text="{loc:Loc YtDlpPath}" Classes="muted" />
+            <TextBox Text="{Binding YtDlpPath, Mode=TwoWay}" PlaceholderText="{loc:Loc AutoDetect}" />
+            <TextBlock Text="{loc:Loc FFmpegPath}" Classes="muted" />
+            <TextBox Text="{Binding FFmpegPath, Mode=TwoWay}" PlaceholderText="{loc:Loc AutoDetect}" />
+            <CheckBox Content="{loc:Loc EmbedMetadata}" IsChecked="{Binding EmbedMetadata, Mode=TwoWay}" />
+            <CheckBox Content="{loc:Loc EmbedThumbnail}" IsChecked="{Binding EmbedThumbnail, Mode=TwoWay}" />
+            <TextBlock Text="{loc:Loc RestartTools}" Classes="muted" FontSize="12" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card padding24">
+          <StackPanel Spacing="12">
+            <TextBlock Text="{loc:Loc Language}" FontSize="19" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" MinWidth="220">
+              <ComboBox.ItemTemplate><DataTemplate x:DataType="loc:LanguageChoice"><TextBlock Text="{Binding Name}" /></DataTemplate></ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Text="{loc:Loc LanguageHelp}" Classes="muted" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card padding24">
+          <StackPanel Spacing="12">
+            <TextBlock Text="{loc:Loc SpotifyTitle}" FontSize="19" FontWeight="SemiBold" Foreground="#8BF0C9" />
+            <TextBlock Text="{loc:Loc SpotifyDisabled}" IsVisible="{Binding !IsSpotifyAvailable}" TextWrapping="Wrap" Classes="muted" />
+            <StackPanel Spacing="12" IsVisible="{Binding IsSpotifyAvailable}">
+            <TextBlock Text="{loc:Loc SpotifyHelp}" TextWrapping="Wrap" />
+            <TextBlock Text="{loc:Loc SpotifySetup}" Classes="muted" TextWrapping="Wrap" FontSize="12" />
+            <TextBox Text="{Binding SpotifyRedirectUri}" IsReadOnly="True" />
+            <TextBlock Text="{loc:Loc SpotifyClientId}" Classes="muted" />
+            <TextBox Text="{Binding SpotifyClientId, Mode=TwoWay}" IsEnabled="{Binding !IsConnectingSpotify}" />
+            <StackPanel Orientation="Horizontal" Spacing="10" IsEnabled="{Binding !IsConnectingSpotify}">
+              <Button Classes="primary" Content="{loc:Loc ConnectSpotify}" Click="ConnectSpotifyButton_OnClick" />
+              <Button Classes="ghost" Content="{loc:Loc DisconnectSpotify}" Command="{Binding DisconnectSpotifyCommand}" />
+            </StackPanel>
+            <TextBlock Text="{Binding SpotifyStatus}" Foreground="#8BF0C9" />
+            <TextBlock Text="{loc:Loc SpotifyPolicy}" Classes="muted" TextWrapping="Wrap" FontSize="11" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Button Classes="primary" Content="{loc:Loc SaveSettings}" Command="{Binding SaveSettingsCommand}" />
+        <TextBlock Text="{Binding SettingsMessage}" TextWrapping="Wrap" Foreground="#8BF0C9" />
+        <TextBlock x:Name="SettingsLocationLabel" Text="{Binding SettingsLocation}" TextWrapping="Wrap" Classes="muted" FontSize="11" />
+        <TextBlock Text="{loc:Loc BundledLicenses}" TextWrapping="Wrap" Classes="muted" FontSize="11" />
+        <Button Classes="ghost" Content="{loc:Loc OpenSourceNotices}" Click="NoticesButton_OnClick" />
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer x:Name="HomeScrollView" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding !IsSettingsOpen}">
+      <StackPanel Classes="page" Spacing="24" MaxWidth="1040">
+        <ui:AdaptiveGrid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <TextBlock Text="{loc:Loc MainTitle}" Classes="pageTitle" FontWeight="Bold" />
+            <TextBlock Text="{loc:Loc MainSubtitle}"
+                       TextWrapping="Wrap"
+                       FontSize="14"
+                       Classes="muted" />
+          </StackPanel>
+          <Border Grid.Column="1"
+                  Background="#152019"
+                  BorderBrush="#294536"
+                  BorderThickness="1"
+                  CornerRadius="18"
+                  Padding="12,7"
+                  VerticalAlignment="Center">
+            <TextBlock Text="{Binding VersionBadge}" Foreground="#8BF0C9" FontSize="12" FontWeight="SemiBold" />
+          </Border>
+        </ui:AdaptiveGrid>
+
+        <Border Classes="card padding24">
+          <StackPanel Spacing="16">
+            <ui:AdaptiveGrid CompactColumnCount="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="9">
+              <TextBox x:Name="UrlInput" Grid.Column="0" ui:AdaptiveGrid.CompactColumnSpan="2"
+                       Classes="urlbox"
+                       Text="{Binding Url, Mode=TwoWay}"
+                       PlaceholderText="{loc:Loc UrlPlaceholder}"
+                       KeyDown="UrlTextBox_OnKeyDown" />
+              <Button Grid.Column="1"
+                      Classes="ghost"
+                      Content="{loc:Loc Paste}"
+                      Click="PasteButton_OnClick" />
+              <Button Grid.Column="2"
+                      Classes="primary"
+                      Content="{Binding AnalyzeButtonText}"
+                      Command="{Binding AnalyzeCommand}"
+                      MinWidth="106" />
+            </ui:AdaptiveGrid>
+
+            <TextBlock Text="{loc:Loc Platforms}"
+                       Classes="muted" FontSize="11" TextWrapping="Wrap" />
+
+            <ui:AdaptiveGrid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+              <TextBlock Grid.Column="0" Text="{loc:Loc SaveTo}" Classes="muted" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1"
+                         Text="{Binding DestinationLabel}"
+                         TextTrimming="CharacterEllipsis"
+                         Foreground="#CED7E3"
+                         VerticalAlignment="Center" />
+              <Button Grid.Column="2" Classes="ghost" Content="{loc:Loc ChooseFolder}" Click="BrowseButton_OnClick" />
+            </ui:AdaptiveGrid>
+
+            <Border IsVisible="{Binding HasProcessingIssue}" Background="#24151D" CornerRadius="12" Padding="14">
+              <StackPanel Spacing="10">
+                <TextBlock Text="{loc:Loc ProcessingUnavailable}" Foreground="#FFADB9" TextWrapping="Wrap" />
+                <Button Classes="ghost" Content="{loc:Loc CheckTools}" Command="{Binding CheckToolsCommand}" />
+              </StackPanel>
+            </Border>
+            <Border IsVisible="{Binding HasError}"
+                    Background="#2A171B"
+                    BorderBrush="#61313A"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="13,10">
+              <TextBlock Text="{Binding ErrorMessage}" Foreground="#FFADB9" TextWrapping="Wrap" />
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card padding22" IsVisible="{Binding HasCollection}">
+          <StackPanel Spacing="14">
+            <TextBlock Text="{loc:Loc PlaylistTitle}" Classes="muted" FontSize="11" />
+            <TextBlock Text="{Binding CollectionTitle}" FontSize="21" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding CollectionSummary}" Foreground="#8BF0C9" />
+            <TextBlock Text="{loc:Loc Truncated}" IsVisible="{Binding CollectionTruncated}" Foreground="#F3C876" />
+            <StackPanel Spacing="8" IsVisible="{Binding IsSpotifyCollection}">
+              <TextBlock Text="{loc:Loc SpotifyHelp}" TextWrapping="Wrap" FontSize="12" Classes="muted" />
+              <TextBlock Text="{loc:Loc SearchConsent}" TextWrapping="Wrap" FontSize="12" Classes="muted" />
+              <Button Classes="ghost" Content="{loc:Loc SearchMatches}" Command="{Binding MatchTracksCommand}" />
+              <TextBlock Text="{loc:Loc MatchNote}" TextWrapping="Wrap" FontSize="11" Foreground="#F3C876" />
+            </StackPanel>
+            <StackPanel Spacing="12" IsEnabled="{Binding !IsBatchBusy}">
+              <ui:AdaptiveGrid CompactColumnCount="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                <ComboBox ui:AdaptiveGrid.CompactColumnSpan="2" ItemsSource="{Binding BatchQualities}" SelectedItem="{Binding BatchQuality, Mode=TwoWay}" HorizontalAlignment="Stretch">
+                  <ComboBox.ItemTemplate><DataTemplate x:DataType="vm:QualityChoice"><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Grid.Column="1" Classes="ghost" Content="{loc:Loc SelectAll}" Command="{Binding SelectAllCommand}" />
+                <Button Grid.Column="2" Classes="ghost" Content="{loc:Loc SelectNone}" Command="{Binding SelectNoneCommand}" />
+              </ui:AdaptiveGrid>
+              <ScrollViewer MaxHeight="340" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding CollectionRows}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CollectionRowViewModel">
+                      <Border Background="#0B1119" BorderBrush="#263343" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,8">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                          <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding CanSelect}" VerticalAlignment="Top" />
+                          <StackPanel Grid.Column="1" Spacing="6">
+                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Details}" IsVisible="{Binding IsSpotify}" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Status}" Foreground="#8BF0C9" FontSize="11" />
+                            <TextBlock Text="{Binding Error}" IsVisible="{Binding HasError}" Foreground="#FFADB9" FontSize="11" TextWrapping="Wrap" />
+                            <ComboBox ItemsSource="{Binding Candidates}" SelectedItem="{Binding SelectedCandidate, Mode=TwoWay}"
+                                      IsVisible="{Binding IsSpotify}" HorizontalAlignment="Stretch"
+                                      PlaceholderText="{loc:Loc ChooseMatch}">
+                              <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:CandidateChoice"><TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" MaxWidth="500" /></DataTemplate>
+                              </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsSpotify}">
+                              <Button Classes="ghost" Content="{loc:Loc OpenSpotify}" Tag="spotify" Click="SourceLink_OnClick" FontSize="11" Padding="9,5" />
+                              <Button Classes="ghost" Content="{loc:Loc OpenSource}" Click="SourceLink_OnClick" FontSize="11" Padding="9,5" />
+                            </StackPanel>
+                          </StackPanel>
+                          <StackPanel Grid.Column="2" Spacing="8">
+                            <TextBlock Text="{Binding Index}" Classes="muted" HorizontalAlignment="Right" />
+                            <TextBlock Text="{Binding Score}" IsVisible="{Binding IsSpotify}" Foreground="#8BF0C9" FontWeight="Bold" />
+                          </StackPanel>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+              <CheckBox IsChecked="{Binding RightsConfirmed, Mode=TwoWay}">
+                <TextBlock Text="{loc:Loc RightsConsent}" TextWrapping="Wrap" FontSize="12" />
+              </CheckBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Classes="primary" Content="{loc:Loc BatchEnqueue}" Command="{Binding BatchEnqueueCommand}" />
+              <Button Classes="ghost" Content="{loc:Loc StopBatch}" Command="{Binding StopBatchCommand}" IsVisible="{Binding IsBatchBusy}" />
+            </StackPanel>
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBatchBusy}" />
+            <TextBlock Text="{Binding BatchMessage}" TextWrapping="Wrap" Foreground="#8BF0C9" />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card padding22" IsVisible="{Binding HasResult}">
+          <Grid RowDefinitions="Auto,18,Auto,18,Auto">
+            <Grid Grid.Row="0" ColumnDefinitions="96,18,*">
+              <Border Grid.Column="0" Width="96" Height="78" CornerRadius="13" Background="#17271F" ClipToBounds="True">
+                <Grid>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="3">
+                  <TextBlock Text="▶" FontSize="25" Foreground="#6EE7B7" HorizontalAlignment="Center" />
+                  <TextBlock Text="{loc:Loc Media}" FontSize="9" Foreground="#8BF0C9" />
+                </StackPanel>
+                <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" />
+                </Grid>
+              </Border>
+              <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="5">
+                <Border HorizontalAlignment="Left" Background="#1B2B24" CornerRadius="7" Padding="8,3">
+                  <TextBlock Text="{Binding MediaSource}" Foreground="#8BF0C9" FontSize="10" FontWeight="Bold" />
+                </Border>
+                <TextBlock Text="{Binding MediaTitle}" FontSize="19" FontWeight="SemiBold" TextWrapping="Wrap" />
+                <WrapPanel Orientation="Horizontal">
+                  <TextBlock Text="{Binding MediaDuration}" Classes="muted" FontSize="12" Margin="0,0,7,0" />
+                  <TextBlock Text="•" Classes="muted" FontSize="12" Margin="0,0,7,0" />
+                  <TextBlock Text="{Binding ResultSummary}" Classes="muted" FontSize="12" />
+                </WrapPanel>
+              </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="2" Background="#0B1119" CornerRadius="12" Padding="10">
+              <ListBox x:Name="FormatOptions" Classes="options" MaxHeight="250"
+                       ItemsSource="{Binding Options}"
+                       SelectedItem="{Binding SelectedOption, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:DownloadOptionViewModel">
+                    <Border BorderBrush="#263343" BorderThickness="1" CornerRadius="10" Padding="14,11">
+                      <ui:AdaptiveGrid CompactColumnCount="2" ColumnDefinitions="72,90,*,Auto" ColumnSpacing="12">
+                        <TextBlock Grid.Column="0" Text="{Binding Container}" FontWeight="Bold" Foreground="#8BF0C9" />
+                        <TextBlock Grid.Column="1" Text="{Binding Quality}" FontWeight="SemiBold" />
+                        <TextBlock Grid.Column="2" Text="{Binding Details}" Classes="muted" />
+                        <TextBlock Grid.Column="3" Text="{Binding Size}" Classes="muted" />
+                      </ui:AdaptiveGrid>
+                    </Border>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Border>
+
+            <ui:AdaptiveGrid Grid.Row="4" ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0"
+                         Text="{loc:Loc SourcePermission}"
+                         Classes="muted"
+                         FontSize="11"
+                         VerticalAlignment="Center" />
+              <Button Grid.Column="1"
+                      Classes="primary"
+                      Content="{loc:Loc Enqueue}"
+                      Command="{Binding EnqueueCommand}" />
+            </ui:AdaptiveGrid>
+          </Grid>
+        </Border>
+
+        <ui:AdaptiveGrid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="3">
+            <TextBlock x:Name="DownloadsHeading" Text="{loc:Loc Downloads}" FontSize="20" FontWeight="SemiBold" />
+            <TextBlock Text="{loc:Loc RecentTransfers}" Classes="muted" FontSize="12" />
+          </StackPanel>
+          <Border Grid.Column="1" Background="#121B26" CornerRadius="12" Padding="11,6" VerticalAlignment="Center">
+            <TextBlock Text="{Binding ParallelLabel}" Classes="muted" FontSize="11" />
+          </Border>
+        </ui:AdaptiveGrid>
+
+        <Border Classes="card padding26" IsVisible="{Binding !HasDownloads}">
+          <StackPanel HorizontalAlignment="Center" Spacing="7">
+            <Border Width="46" Height="46" CornerRadius="23" Background="#16202C">
+              <TextBlock Text="↓" FontSize="24" Foreground="#65758A" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="{loc:Loc EmptyQueue}" FontWeight="SemiBold" HorizontalAlignment="Center" />
+            <TextBlock Text="{loc:Loc EmptyQueueHelp}"
+                       Classes="muted"
+                       FontSize="12"
+                       HorizontalAlignment="Center" />
+          </StackPanel>
+        </Border>
+
+        <ItemsControl ItemsSource="{Binding Downloads}" IsVisible="{Binding HasDownloads}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:DownloadItemViewModel">
+              <Border Classes="card padding18" Margin="0,0,0,10">
+                <Grid RowDefinitions="Auto,12,Auto,10,Auto">
+                  <ui:AdaptiveGrid Grid.Row="0" ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="15" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Meta}" Classes="muted" FontSize="11" />
+                    </StackPanel>
+                    <Border Grid.Column="1" Background="#18251F" CornerRadius="8" Padding="9,4" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Status}" Foreground="#8BF0C9" FontSize="10" FontWeight="SemiBold" />
+                    </Border>
+                  </ui:AdaptiveGrid>
+                  <ProgressBar Grid.Row="2"
+                               Minimum="0"
+                               Maximum="100"
+                               Value="{Binding ProgressValue}"
+                               IsIndeterminate="{Binding IsIndeterminate}" />
+                  <ui:AdaptiveGrid Grid.Row="4" CompactColumnCount="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <TextBlock Grid.Column="0" ui:AdaptiveGrid.CompactColumnSpan="2" Text="{Binding ProgressText}" Classes="muted" FontSize="11" VerticalAlignment="Center" />
+                    <Button Grid.Column="1"
+                            Classes="ghost"
+                            Content="{Binding PrimaryActionLabel}"
+                            Command="{Binding PrimaryActionCommand}"
+                            IsVisible="{Binding CanUsePrimaryAction}"
+                            Padding="12,7" />
+                    <Button Grid.Column="2"
+                            Classes="ghost"
+                            Content="{loc:Loc Cancel}"
+                            Command="{Binding CancelCommand}"
+                            IsVisible="{Binding CanCancel}"
+                            Padding="12,7" />
+                  </ui:AdaptiveGrid>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

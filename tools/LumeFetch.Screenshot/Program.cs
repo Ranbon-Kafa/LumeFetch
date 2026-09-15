@@ -9,10 +9,10 @@ using LumeFetch.Core.Providers;
 using LumeFetch.Core.Services;
 using LumeFetch.Core.Settings;
 using LumeFetch.Desktop;
-using LumeFetch.Desktop.ViewModels;
 using LumeFetch.Desktop.Views;
 using LumeFetch.Infrastructure.Processing;
 using LumeFetch.Infrastructure.Settings;
+using LumeFetch.Presentation.ViewModels;
 
 namespace LumeFetch.Screenshot;
 
@@ -37,6 +37,8 @@ internal static partial class Program
                 var output = args.FirstOrDefault(arg => !arg.StartsWith("--", StringComparison.Ordinal))
                     ?? Path.Combine("docs", "screenshots", "lumefetch-main.png");
                 await RenderAndVerifyAsync(Path.GetFullPath(output));
+                await VerifyResponsiveUiAsync(Path.GetDirectoryName(Path.GetFullPath(output))!);
+                await VerifyProcessingAvailabilityAsync(Path.GetDirectoryName(Path.GetFullPath(output))!);
             }
             catch (Exception exception) { Console.Error.WriteLine(exception); exitCode = 1; }
             finally { finished.Cancel(); }
@@ -107,7 +109,7 @@ internal static partial class Program
         // Public screenshots use fixture paths, never the developer's home/workspace name.
         var vm = (MainWindowViewModel)window.DataContext!;
         var actualDirectory = vm.DestinationDirectory;
-        var locationLabel = window.FindControl<TextBlock>("SettingsLocationLabel")!;
+        var locationLabel = ((LumeFetch.Presentation.Views.MainView)window.Content!).FindControl<TextBlock>("SettingsLocationLabel")!;
         var actualLocation = locationLabel.Text;
         try
         {

@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text.Json;
 using LumeFetch.Core.Downloads;
 using LumeFetch.Core.Media;
 using LumeFetch.Core.Processing;
@@ -23,7 +22,7 @@ public sealed class Mp3Tests
         var media = await provider.AnalyzeAsync(new Uri("https://www.youtube.com/watch?v=abcdefghijk"));
         var option = Assert.Single(media.Options, item => item.Container == "mp3");
         Assert.Equal(MediaKind.Audio, option.Kind);
-        var plan = JsonSerializer.Deserialize<YtDlpDownloadPlan>(option.ProviderData!)!;
+        var plan = YtDlpPlanJson.Deserialize(option.ProviderData!);
         Assert.Equal("source", plan.FormatSelector);
         Assert.Equal(extract, plan.ExtractAudio);
         Assert.Equal("mp3", plan.OutputContainer);
@@ -42,7 +41,7 @@ public sealed class Mp3Tests
             new("high", "webm", null, null, "none", "opus", 2000, 160)]));
         var media = await provider.AnalyzeAsync(new Uri("https://youtu.be/abcdefghijk"));
         var mp3 = Assert.Single(media.Options, item => item.Container == "mp3");
-        Assert.Equal("high", JsonSerializer.Deserialize<YtDlpDownloadPlan>(mp3.ProviderData!)!.FormatSelector);
+        Assert.Equal("high", YtDlpPlanJson.Deserialize(mp3.ProviderData!).FormatSelector);
     }
 
     [Theory]
@@ -58,6 +57,23 @@ public sealed class Mp3Tests
             .AnalyzeAsync(new Uri("https://example.org/" + file));
         Assert.Equal(conversion, media.Options.Any(option => option.Id == "mp3-convert"));
         if (conversion) Assert.Null(media.Options.Single(option => option.Id == "mp3-convert").EstimatedBytes);
+    }
+
+    [Fact]
+    public async Task DirectMp3StartupFailureDoesNotFetchMedia()
+    {
+        var destination = Path.Combine(Path.GetTempPath(), "lumefetch-mp3-preflight-" + Guid.NewGuid().ToString("N"));
+        var handler = new MediaHandler("video/mp4");
+        using var http = new HttpClient(handler);
+        var provider = new GenericHttpMediaProvider(http, new FakeFfmpeg(true) { StartupFailure = true });
+        var media = await provider.AnalyzeAsync(new Uri("https://example.org/sample.mp4"));
+        var requests = handler.Requests;
+        var context = new DownloadContext(Guid.NewGuid(), media, media.Options.Single(option => option.Id == "mp3-convert"),
+            destination, new AlwaysRunning());
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => provider.DownloadAsync(context, new InlineProgress(_ => { })));
+        Assert.Equal("Fixture startup failure", error.Message);
+        Assert.Equal(requests, handler.Requests);
+        Assert.False(Directory.Exists(destination));
     }
 
     [Fact]
@@ -96,8 +112,10 @@ public sealed class Mp3Tests
     }
     private sealed class MediaHandler(string type) : HttpMessageHandler
     {
+        public int Requests { get; private set; }
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            Requests++;
             var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("fixture source bytes") };
             response.Content.Headers.ContentType = new MediaTypeHeaderValue(type);
             return Task.FromResult(response);
@@ -108,8 +126,10 @@ public sealed class Mp3Tests
         public string? ExecutablePath => null;
         public bool IsAvailable => available;
         public bool Fail { get; set; }
+        public bool StartupFailure { get; set; }
         public string? Codec { get; private set; }
-        public Task<string?> GetVersionAsync(CancellationToken cancellationToken = default) => Task.FromResult<string?>("fixture");
+        public Task<string?> GetVersionAsync(CancellationToken cancellationToken = default) => StartupFailure
+            ? throw new InvalidOperationException("Fixture startup failure") : Task.FromResult<string?>("fixture");
         public Task MuxAsync(string videoPath, string audioPath, string outputPath, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public async Task ExtractAudioAsync(string inputPath, string outputPath, string codec, CancellationToken cancellationToken = default)
         {

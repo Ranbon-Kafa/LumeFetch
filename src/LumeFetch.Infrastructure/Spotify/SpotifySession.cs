@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using LumeFetch.Core.Resolvers;
 
 namespace LumeFetch.Infrastructure.Spotify;
 
@@ -12,9 +13,10 @@ public interface ISpotifyTokenSource
 }
 
 /// <summary>PKCE public client. Tokens live only in memory and are never written to settings/logs.</summary>
-public sealed class SpotifySession(HttpClient httpClient) : ISpotifyTokenSource, IDisposable
+public sealed class SpotifySession(HttpClient httpClient) : ISpotifyTokenSource, ICatalogSession, IDisposable
 {
     public const string RedirectUri = "http://127.0.0.1:43821/callback";
+    public string CallbackUri => RedirectUri;
     private readonly SemaphoreSlim _gate = new(1);
     private readonly object _stateLock = new();
     private string? _accessToken;

@@ -4,10 +4,11 @@
 
 **One downloader. Many platforms. Open source.**
 
-[Windows downloads](https://github.com/Ranbon-Kafa/LumeFetch/releases) ·
+[Windows downloads](https://github.com/Ranbon-Kafa/LumeFetch/releases/tag/v1.0.0) ·
+[Android APK (beta)](https://github.com/Ranbon-Kafa/LumeFetch/releases/tag/android-v1.1.0-beta.1) ·
 [Website](https://ruzgarefe.com) · [Report an issue](https://github.com/Ranbon-Kafa/LumeFetch/issues)
 
-Modern Windows-first media download manager built with C#, .NET and Avalonia.
+Modern Windows and Android media download manager built with C#, .NET and Avalonia.
 Maintained by **Ranbon-Kafa / ruzgarefe.com** and the LumeFetch contributors.
 
 > Use only for media you own, are authorized to download, or whose terms permit
@@ -43,6 +44,33 @@ Routing tests do not guarantee that a particular site's URL will work today.
 
 ## Download and use
 
+### Android 1.1.0-beta.1
+
+Download the **ARM64 APK** from the [Android release](https://github.com/Ranbon-Kafa/LumeFetch/releases/tag/android-v1.1.0-beta.1).
+Android 8+ (API 26), 64-bit ARM; MP3 and MP4 were confirmed by the maintainer on
+a Samsung Galaxy S25 Ultra / Android 16 with the build 7 runtime. This is the
+first public Android **beta**, not a claim of full device/provider certification.
+The developer diagnostics card is removed. FFmpeg, FFprobe, Python, yt-dlp and
+QuickJS are already bundled; no first-launch tool download is required.
+
+Choose a writable folder in Settings, save it, then paste/share an authorized URL.
+The same playlist, format and queue commands are available with phone navigation.
+Background work remains subject to Android limits; unfinished jobs reopen paused.
+Spotify is disabled and iOS is on hold. See [test coverage and limitations](packaging/android/ACCEPTANCE.md).
+
+**Migrating from a private test APK:** the public APK uses a new permanent signing
+certificate. Android cannot update a debug-signed test installation with this key.
+Finish/export important downloads before deciding to remove the test installation;
+removal deletes private settings, history and unfinished files. No automatic removal
+is performed. Future public updates will use the same permanent certificate.
+Check `SHA256SUMS.txt` and the [public signing identity](packaging/android/SIGNING.md).
+
+<img src="docs/screenshots/lumefetch-android-settings.png" alt="LumeFetch Android beta Settings, without the developer diagnostics card" width="300" />
+
+*Actual Android 16 emulator capture; phone acceptance is documented separately.*
+
+### Windows 1.0.0
+
 Get the installer or portable ZIP from [GitHub Releases](https://github.com/Ranbon-Kafa/LumeFetch/releases).
 The installer is per-user and does not require administrator privileges. For
 portable use, extract the **entire ZIP** before opening `LumeFetch.exe`.
@@ -73,6 +101,10 @@ Tools can be replaced with trusted compatible builds through Settings.
 The application requires the .NET 10 SDK. Windows binaries target x64. Linux/macOS
 source builds are architectural targets, not tested or packaged v1 releases.
 
+Android is distributed separately as a beta ARM64 APK. The shared UI adapts to
+phone widths without removing desktop commands. See [Android build instructions](packaging/android/NATIVE-BUILD.md)
+and [mobile architecture and limitations](docs/MOBILE.md). No iOS app is available.
+
 ```powershell
 dotnet restore LumeFetch.sln
 dotnet build LumeFetch.sln -c Release
@@ -100,7 +132,9 @@ the corresponding-source archive with every binary distribution. See
 
 `Core` owns provider/resolver contracts, matching, media models and the download
 manager. `Infrastructure` implements HTTP transfers and external tool adapters.
-`Desktop` composes those services and presents the Avalonia UI. yt-dlp and FFmpeg
+`Presentation` owns the shared Avalonia views, view models and localization bindings;
+it references only `Core` and portable Avalonia packages. `Desktop` composes the
+services and hosts that same view in a window. yt-dlp and FFmpeg
 are backend processes; queue ownership, state, error handling and UX belong to
 LumeFetch. See [architecture](docs/ARCHITECTURE.md) and [CONTRIBUTING](CONTRIBUTING.md).
 
@@ -113,7 +147,8 @@ login does not imply service approval. See [Spotify decision](docs/SPOTIFY.md).
 - No DRM, login cookies, private media, live broadcasts, profiles or carousels.
 - HTTP byte resume requires a strong ETag and valid range support; otherwise it
   safely restarts. yt-dlp resumes where its backend permits.
-- Queue history is in memory. Resume/retry operates within the app session.
+- Windows v1 queue history is in memory. The Android development host adds private
+  queue/history recovery after process death; see [mobile status](docs/MOBILE.md).
   Partials under `.lumefetch/<job-id>` in the chosen folder survive cancellation
   and uninstall; remove only unneeded job folders after closing the application.
 - Automatic updates, dynamic plugin loading and Linux/macOS installers are future work.

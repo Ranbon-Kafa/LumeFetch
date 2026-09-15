@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(LumeFetchAndroidRuntime)</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">android-arm64</RuntimeIdentifier>
+    <ApplicationId>com.ruzgarefe.lumefetch</ApplicationId>
+    <ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
+    <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">1.1.0-dev</ApplicationDisplayVersion>
+    <AndroidPackageFormats>apk</AndroidPackageFormats>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <BundledToolsRoot Condition="'$(BundledToolsRoot)' == ''">$(MSBuildThisFileDirectory)../../.tools/android-backend/prepared</BundledToolsRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Android" />
+    <ProjectReference Include="../LumeFetch.Presentation/LumeFetch.Presentation.csproj" />
+    <ProjectReference Include="../LumeFetch.Infrastructure/LumeFetch.Infrastructure.csproj" />
+    <AndroidAsset Include="$(BundledToolsRoot)/assets/tools/manifest.json" Link="tools/manifest.json" />
+    <AndroidAsset Include="$(BundledToolsRoot)/assets/tools/yt-dlp" Link="tools/yt-dlp" />
+    <AndroidAsset Include="$(BundledToolsRoot)/assets/notices/**/*" Link="notices/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'android-arm64'">
+    <AndroidNativeLibrary Include="$(BundledToolsRoot)/jni/arm64-v8a/*.so" Abi="arm64-v8a" />
+    <AndroidAsset Include="$(BundledToolsRoot)/assets/tools/arm64-v8a/*.zip" Link="tools/arm64-v8a/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'android-x64'">
+    <AndroidNativeLibrary Include="$(BundledToolsRoot)/jni/x86_64/*.so" Abi="x86_64" />
+    <AndroidAsset Include="$(BundledToolsRoot)/assets/tools/x86_64/*.zip" Link="tools/x86_64/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <Target Name="RequireBundledAndroidTools" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('$(BundledToolsRoot)/assets/tools/manifest.json')" Text="Run scripts/Get-AndroidTools.ps1 before building. A tool-free APK is not supported." />
+    <Error Condition="'$(RuntimeIdentifier)' != 'android-arm64' and '$(RuntimeIdentifier)' != 'android-x64'" Text="Only android-arm64 and android-x64 tool packages are prepared." />
+  </Target>
+</Project>

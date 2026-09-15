@@ -1,4 +1,3 @@
-using System.Text.Json;
 using LumeFetch.Core.Downloads;
 using LumeFetch.Core.Media;
 using LumeFetch.Core.Providers;
@@ -57,8 +56,7 @@ public abstract class YtDlpMediaProvider : IMediaProvider
             throw new InvalidOperationException("The selected format is missing its download plan.");
         }
 
-        var plan = JsonSerializer.Deserialize<YtDlpDownloadPlan>(context.Option.ProviderData)
-            ?? throw new InvalidOperationException("The selected format has an invalid download plan.");
+        var plan = YtDlpPlanJson.Deserialize(context.Option.ProviderData);
         var request = new YtDlpDownloadRequest(
             context.Media.SourceUri,
             SafeFileName.Create(context.Media.Title),
@@ -102,13 +100,13 @@ public abstract class YtDlpMediaProvider : IMediaProvider
                 MediaKind.Audio,
                 AudioCodec: audio.AudioCodec,
                 EstimatedBytes: audio.EstimatedBytes,
-                ProviderData: JsonSerializer.Serialize(plan)));
+                ProviderData: YtDlpPlanJson.Serialize(plan)));
         }
 
         if (audio is null && formats.FirstOrDefault(format => format.HasAudio && format.HasVideo) is { } combined)
         {
             options.Add(new DownloadOption("audio-extract", "Audio", "m4a", MediaKind.Audio,
-                ProviderData: JsonSerializer.Serialize(new YtDlpDownloadPlan(combined.Id, "m4a", ExtractAudio: true))));
+                ProviderData: YtDlpPlanJson.Serialize(new YtDlpDownloadPlan(combined.Id, "m4a", ExtractAudio: true))));
         }
         // MP3 is a real FFmpeg conversion, not a renamed M4A/Opus file.
         var mp3Source = formats.Where(format => format.HasAudio && !format.HasVideo)
@@ -119,7 +117,7 @@ public abstract class YtDlpMediaProvider : IMediaProvider
         {
             options.Add(new DownloadOption("audio-mp3", "Audio", "mp3", MediaKind.Audio,
                 AudioCodec: "MP3", EstimatedBytes: null,
-                ProviderData: JsonSerializer.Serialize(new YtDlpDownloadPlan(mp3Source.Id, "mp3", ExtractAudio: true))));
+                ProviderData: YtDlpPlanJson.Serialize(new YtDlpDownloadPlan(mp3Source.Id, "mp3", ExtractAudio: true))));
         }
         return options;
     }
@@ -148,6 +146,6 @@ public abstract class YtDlpMediaProvider : IMediaProvider
             format.VideoCodec,
             format.HasAudio ? format.AudioCodec : "best audio",
             format.HasAudio ? format.EstimatedBytes : format.EstimatedBytes + audio!.EstimatedBytes,
-            JsonSerializer.Serialize(plan));
+            YtDlpPlanJson.Serialize(plan));
     }
 }

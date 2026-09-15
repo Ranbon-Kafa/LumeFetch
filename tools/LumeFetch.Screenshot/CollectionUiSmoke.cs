@@ -3,10 +3,10 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using LumeFetch.Core.Collections;
 using LumeFetch.Core.Resolvers;
-using LumeFetch.Desktop.Localization;
-using LumeFetch.Desktop.ViewModels;
 using LumeFetch.Desktop.Views;
 using LumeFetch.Infrastructure.Settings;
+using LumeFetch.Presentation.Localization;
+using LumeFetch.Presentation.ViewModels;
 
 namespace LumeFetch.Screenshot;
 
@@ -75,7 +75,7 @@ internal static partial class Program
         await UntilAsync(() => vm.SettingsMessage == Localizer.Current["SettingsSaved"]);
         Require(store.Load().Language == "tr", "Language persists");
         Capture(window, Path.Combine(output, "lumefetch-settings-tr.png"));
-        var settingsScroll = window.FindControl<ScrollViewer>("SettingsScrollView")!;
+        var settingsScroll = ((LumeFetch.Presentation.Views.MainView)window.Content!).FindControl<ScrollViewer>("SettingsScrollView")!;
         settingsScroll.Offset = new Avalonia.Vector(0, settingsScroll.Extent.Height);
         Capture(window, Path.Combine(output, "lumefetch-spotify-setup-tr.png"));
         vm.SelectedLanguage = vm.Languages.Single(language => language.Code == "en");

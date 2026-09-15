@@ -5,12 +5,12 @@ using Avalonia.Markup.Xaml;
 using LumeFetch.Core.Downloads;
 using LumeFetch.Core.Providers;
 using LumeFetch.Core.Services;
-using LumeFetch.Desktop.ViewModels;
 using LumeFetch.Desktop.Views;
 using LumeFetch.Infrastructure.Processing;
 using LumeFetch.Infrastructure.Providers;
 using LumeFetch.Infrastructure.Settings;
 using LumeFetch.Infrastructure.YtDlp;
+using LumeFetch.Presentation.ViewModels;
 
 namespace LumeFetch.Desktop;
 

@@ -83,6 +83,71 @@ public sealed class DownloadManagerTests
     }
 
     private static readonly DownloadOption Option = new("original", "Original", "mp4", MediaKind.Video);
+
+    [Fact]
+    public async Task ExportFailureRetainsCompletedTransferForRetry()
+    {
+        var provider = new ControlledProvider();
+        provider.Completion.TrySetResult();
+        var output = new ControlledOutput { FailFirst = true };
+        output.Completion.TrySetResult();
+        await using var manager = new DownloadManager(new ProviderRegistry([provider]), output: output);
+        var job = manager.Enqueue(Media, Option, Path.GetTempPath());
+        await UntilAsync(() => manager.Jobs[0].Status == DownloadStatus.Failed);
+        Assert.Equal(1, provider.Starts[job.Id]);
+        Assert.True(manager.Retry(job.Id));
+        await UntilAsync(() => manager.Jobs[0].Status == DownloadStatus.Completed);
+        Assert.Equal(1, provider.Starts[job.Id]);
+        Assert.Equal(2, output.Attempts);
+        Assert.Equal("content://test/export.mp4", manager.Jobs[0].OutputPath);
+    }
+
+    [Fact]
+    public async Task CancelDuringExportDoesNotRedownloadWhenRetried()
+    {
+        var provider = new ControlledProvider();
+        provider.Completion.TrySetResult();
+        var output = new ControlledOutput();
+        await using var manager = new DownloadManager(new ProviderRegistry([provider]), output: output);
+        var job = manager.Enqueue(Media, Option, Path.GetTempPath());
+        await UntilAsync(() => output.Attempts == 1);
+        Assert.Equal(DownloadStatus.Processing, manager.Jobs[0].Status);
+        Assert.True(manager.Cancel(job.Id));
+        Assert.True(manager.Retry(job.Id));
+        await UntilAsync(() => output.Attempts == 2);
+        output.Completion.TrySetResult();
+        await UntilAsync(() => manager.Jobs[0].Status == DownloadStatus.Completed);
+        Assert.Equal(1, provider.Starts[job.Id]);
+    }
+
+    [Fact]
+    public void MissingDestinationGrantRejectsJobBeforeTransfer()
+    {
+        var provider = new ControlledProvider();
+        using var manager = new DownloadManager(new ProviderRegistry([provider]), output: new ControlledOutput { RejectDestination = true });
+        Assert.Throws<IOException>(() => manager.Enqueue(Media, Option, Path.GetTempPath()));
+        Assert.Empty(manager.Jobs);
+        Assert.Empty(provider.Starts);
+    }
+
+    private sealed class ControlledOutput : IDownloadOutput
+    {
+        public bool FailFirst { get; init; }
+        public bool RejectDestination { get; init; }
+        public int Attempts;
+        public TaskCompletionSource Completion { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public void ValidateDestination(string destinationDirectory)
+        {
+            if (RejectDestination) throw new IOException("Folder access missing");
+        }
+        public async Task<DownloadResult> PublishAsync(DownloadResult localFile, string destinationDirectory, CancellationToken cancellationToken = default)
+        {
+            var attempt = Interlocked.Increment(ref Attempts);
+            if (FailFirst && attempt == 1) throw new IOException("Temporary export failure");
+            await Completion.Task.WaitAsync(cancellationToken);
+            return localFile with { OutputPath = "content://test/export.mp4" };
+        }
+    }
     private static readonly MediaInfo Media = new("test", "Test", new Uri("https://example.org/test.mp4"), "test", null, null, [Option]);
 
     private static async Task UntilAsync(Func<bool> predicate)

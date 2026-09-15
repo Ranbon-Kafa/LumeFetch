@@ -13,4 +13,6 @@ public sealed record DownloadJobSnapshot(
     double BytesPerSecond,
     TimeSpan? EstimatedRemaining,
     string? OutputPath,
-    string? ErrorMessage);
+    string? ErrorMessage,
+    string? OutputDisplayPath = null,
+    bool RequiresReview = false);

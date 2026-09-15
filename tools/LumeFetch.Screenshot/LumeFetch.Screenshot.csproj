@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>LumeFetch.Screenshot</RootNamespace>
     <AssemblyName>LumeFetch.Screenshot</AssemblyName>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
     <!-- Reflection bindings intentionally consume instance-only preview properties. -->
     <NoWarn>$(NoWarn);CA1822</NoWarn>
   </PropertyGroup>

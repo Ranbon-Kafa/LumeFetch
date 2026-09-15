@@ -13,19 +13,25 @@ public sealed partial class YtDlpClient : IYtDlpClient
     private const string OutputMarker = "__LUMEFETCH_FILE__";
     private const string ProgressMarker = "__LUMEFETCH_PROGRESS__";
     private readonly string? _ffmpegPath;
-    private readonly string? _denoPath;
+    private readonly string? _javaScriptRuntime;
+    private readonly ToolCommand? _command;
     private readonly bool _embedMetadata;
     private readonly bool _embedThumbnail;
+    private readonly Func<CancellationToken, Task>? _processingCheck;
 
-    public YtDlpClient(string? executablePath = null, string? ffmpegPath = null, bool embedMetadata = true, bool embedThumbnail = false)
+    public YtDlpClient(string? executablePath = null, string? ffmpegPath = null, bool embedMetadata = true, bool embedThumbnail = false,
+        ToolCommand? command = null, string? javaScriptRuntime = null, Func<CancellationToken, Task>? processingCheck = null)
     {
-        ExecutablePath = executablePath ?? ExternalToolLocator.Find(
+        ExecutablePath = command?.ExecutablePath ?? executablePath ?? ExternalToolLocator.Find(
             "yt-dlp",
             Path.Combine(Environment.CurrentDirectory, ".tools", "yt-dlp"));
         _ffmpegPath = ffmpegPath;
-        _denoPath = ExternalToolLocator.Find("deno", Path.Combine(Environment.CurrentDirectory, ".tools", "deno"));
+        _command = command ?? (ExecutablePath is null ? null : new ToolCommand(ExecutablePath));
+        var denoPath = javaScriptRuntime is null ? ExternalToolLocator.Find("deno", Path.Combine(Environment.CurrentDirectory, ".tools", "deno")) : null;
+        _javaScriptRuntime = javaScriptRuntime ?? (denoPath is null ? null : "deno:" + denoPath);
         _embedMetadata = embedMetadata;
         _embedThumbnail = embedThumbnail;
+        _processingCheck = processingCheck;
     }
 
     public string? ExecutablePath { get; }
@@ -82,9 +88,13 @@ public sealed partial class YtDlpClient : IYtDlpClient
         CancellationToken cancellationToken = default)
     {
         EnsureAvailable();
-        Directory.CreateDirectory(request.DestinationDirectory);
-        if ((_embedMetadata || _embedThumbnail || request.Plan.ExtractAudio || request.Plan.FormatSelector.Contains('+')) && _ffmpegPath is null)
+        cancellationToken.ThrowIfCancellationRequested();
+        var needsProcessing = _embedMetadata || _embedThumbnail || request.Plan.ExtractAudio || request.Plan.FormatSelector.Contains('+');
+        if (needsProcessing && _ffmpegPath is null)
             throw new FileNotFoundException("FFmpeg is required for this selection. Configure it in Settings and restart.");
+        if (needsProcessing && _processingCheck is not null)
+            await _processingCheck(cancellationToken).ConfigureAwait(false);
+        Directory.CreateDirectory(request.DestinationDirectory);
         var destination = request.DestinationDirectory;
         var work = DownloadFiles.WorkingDirectory(destination, request.JobId == Guid.Empty ? Guid.NewGuid() : request.JobId);
         request = request with { DestinationDirectory = work };
@@ -195,7 +205,7 @@ public sealed partial class YtDlpClient : IYtDlpClient
                 if (control.IsPaused)
                 {
                     wasPaused = true;
-                    process.Kill(entireProcessTree: true);
+                    _command!.Terminate(process);
                     break;
                 }
 
@@ -208,7 +218,7 @@ public sealed partial class YtDlpClient : IYtDlpClient
         {
             if (!process.HasExited)
             {
-                process.Kill(entireProcessTree: true);
+                _command!.Terminate(process);
                 await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
             }
             await Task.WhenAll(outputTask, errorTask).ConfigureAwait(false);
@@ -238,7 +248,7 @@ public sealed partial class YtDlpClient : IYtDlpClient
         {
             if (!process.HasExited)
             {
-                process.Kill(entireProcessTree: true);
+                _command!.Terminate(process);
                 await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
             }
 
@@ -260,24 +270,16 @@ public sealed partial class YtDlpClient : IYtDlpClient
     private Process CreateProcess(IReadOnlyList<string> arguments)
     {
         EnsureAvailable();
-        var startInfo = new ProcessStartInfo(ExecutablePath!)
-        {
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            StandardOutputEncoding = System.Text.Encoding.UTF8,
-            StandardErrorEncoding = System.Text.Encoding.UTF8,
-        };
+        var startInfo = _command!.CreateStartInfo([]);
 
         startInfo.Environment["PYTHONIOENCODING"] = "utf-8";
         startInfo.Environment["PYTHONUTF8"] = "1";
         foreach (var flag in new[] { "--ignore-config", "--no-plugin-dirs", "--no-cache-dir", "--no-js-runtimes", "--encoding", "utf-8" })
             startInfo.ArgumentList.Add(flag);
-        if (_denoPath is not null)
+        if (_javaScriptRuntime is not null)
         {
             startInfo.ArgumentList.Add("--js-runtimes");
-            startInfo.ArgumentList.Add("deno:" + _denoPath);
+            startInfo.ArgumentList.Add(_javaScriptRuntime);
         }
         foreach (var argument in arguments)
         {

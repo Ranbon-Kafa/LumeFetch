@@ -1,0 +1,140 @@
+[
+  {
+    "component": "yt-dlp 2026.08.19 with build recipes",
+    "file": "yt-dlp-2026.08.19.tar.gz",
+    "url": "https://codeload.github.com/yt-dlp/yt-dlp/tar.gz/refs/tags/2026.08.19",
+    "sha256": "a0779c45179a846986a852bce31bddbe9259b594574f75c0ec146d0567058f7e",
+    "cache": ".tools/release-sources"
+  },
+  {
+    "component": "FFmpeg 9.0.1",
+    "file": "ffmpeg-9.0.1.tar.xz",
+    "url": "https://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz",
+    "sha256": "cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635",
+    "cache": ".tools/release-sources"
+  },
+  {
+    "component": "LAME 3.100",
+    "file": "lame-3.100.tar.gz",
+    "url": "https://deb.debian.org/debian/pool/main/l/lame/lame_3.100.orig.tar.gz",
+    "sha256": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e",
+    "cache": ".tools/release-sources"
+  },
+  {
+    "component": "Opus 1.6.1",
+    "file": "opus-1.6.1.tar.gz",
+    "url": "https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz",
+    "sha256": "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1",
+    "cache": ".tools/release-sources"
+  },
+  {
+    "component": "zlib 1.3.2 (FFmpeg)",
+    "file": "zlib-1.3.2.tar.gz",
+    "url": "https://zlib.net/zlib-1.3.2.tar.gz",
+    "sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+    "cache": ".tools/release-sources"
+  },
+  {
+    "component": "zstd 1.5.7",
+    "file": "zstd-1.5.7.tar.gz",
+    "url": "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",
+    "sha256": "eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3",
+    "cache": ".tools/release-sources"
+  },
+  {
+    "file": "Python-3.14.7.tar.xz",
+    "url": "https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz",
+    "sha256": "3b48dac8fb59f62eaa67ac83c1eb12bda1b7a08406dd286e252c11a66be27f81",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "bzip2-1.0.8.tar.gz",
+    "url": "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz",
+    "sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "libffi-3.4.4.tar.gz",
+    "url": "https://github.com/libffi/libffi/releases/download/v3.4.4/libffi-3.4.4.tar.gz",
+    "sha256": "d66c56ad259a82cf2a9dfc408b32bf5da52371500b84745f7fb8b645712df676",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "openssl-3.5.7.tar.gz",
+    "url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.7/openssl-3.5.7.tar.gz",
+    "sha256": "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "sqlite-autoconf-3500400.tar.gz",
+    "url": "https://www.sqlite.org/2025/sqlite-autoconf-3500400.tar.gz",
+    "sha256": "a3db587a1b92ee5ddac2f66b3edb41b26f9c867275782d46c3a088977d6a5b18",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "xz-5.4.6.tar.gz",
+    "url": "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz",
+    "sha256": "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "quickjs-2026-06-04.tar.xz",
+    "url": "https://bellard.org/quickjs/quickjs-2026-06-04.tar.xz",
+    "sha256": "b376e839b322978313d929fd20663b11ba58b75df5a46c126dd19ea2fa70ad2a",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "android-recipe-bzip2-1.0.8-3.tar.gz",
+    "url": "https://codeload.github.com/beeware/cpython-android-source-deps/tar.gz/refs/tags/bzip2-1.0.8-3",
+    "sha256": "265397f190467b02c7240871856f0d8850750a08bbb2f51453520188e2fd4f7d",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "android-recipe-libffi-3.4.4-3.tar.gz",
+    "url": "https://codeload.github.com/beeware/cpython-android-source-deps/tar.gz/refs/tags/libffi-3.4.4-3",
+    "sha256": "a62b0629ceebad486149add1c7cb01a25a2b63a8ecc664384947b1b3cd2728d0",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "android-recipe-openssl-3.5.7-0.tar.gz",
+    "url": "https://codeload.github.com/beeware/cpython-android-source-deps/tar.gz/refs/tags/openssl-3.5.7-0",
+    "sha256": "018fcb54cad2078462ca8f95c7e920163181f2895f84229195bdb6bd1f2433fa",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "android-recipe-sqlite-3.50.4-0.tar.gz",
+    "url": "https://codeload.github.com/beeware/cpython-android-source-deps/tar.gz/refs/tags/sqlite-3.50.4-0",
+    "sha256": "f77e764265d52feb800901dfe42f9d5647726cbf72aa253eea46ae2526d069f8",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "android-recipe-xz-5.4.6-1.tar.gz",
+    "url": "https://codeload.github.com/beeware/cpython-android-source-deps/tar.gz/refs/tags/xz-5.4.6-1",
+    "sha256": "791b4ea0dcea392324f33acd83975ab7d192a5d1a568f7958bd908453c8ce2a2",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "android-recipe-zstd-1.5.7-2.tar.gz",
+    "url": "https://codeload.github.com/beeware/cpython-android-source-deps/tar.gz/refs/tags/zstd-1.5.7-2",
+    "sha256": "3731a5223183213353b325e78917a69dfff26164f9cd7b652dec35bf5f7f5105",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "yt_dlp_ejs-0.8.0.tar.gz",
+    "url": "https://files.pythonhosted.org/packages/d3/e6/cceb9530e8f4e5940f6f7822d90e9d94f1b85343329a16baaf47bbbb3de1/yt_dlp_ejs-0.8.0.tar.gz",
+    "sha256": "d5fa1639f63b5c4af8d932495f60689d5370f1a095782c944f7f62a303eb104e",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "astring-1.9.0.tgz",
+    "url": "https://registry.npmjs.org/astring/-/astring-1.9.0.tgz",
+    "sha256": "422cca9707aca293e85eb54fdbbc5a0a167ad415236a325ff342e720e67afb49",
+    "cache": ".tools/android-native/downloads"
+  },
+  {
+    "file": "meriyah-6.1.4.tgz",
+    "url": "https://registry.npmjs.org/meriyah/-/meriyah-6.1.4.tgz",
+    "sha256": "c0f105d9fb01bb48c76ea6ee382e6099277b95e3f351fb99b67ddfb79d6088b8",
+    "cache": ".tools/android-native/downloads"
+  }
+]

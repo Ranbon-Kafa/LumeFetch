@@ -1,0 +1,89 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <FluentTheme />
+
+    <Style Selector="Window, :is(UserControl).lumefetch">
+      <Setter Property="FontFamily" Value="avares://Avalonia.Fonts.Inter/Assets#Inter" />
+      <Setter Property="Background" Value="#080C12" />
+      <Setter Property="Foreground" Value="#F4F7FB" />
+    </Style>
+
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="#8E9AAC" />
+    </Style>
+
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#111822" />
+      <Setter Property="BorderBrush" Value="#202B3A" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="18" />
+    </Style>
+
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="16,10" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#6EE7B7" />
+      <Setter Property="Foreground" Value="#06231A" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#8BF0C9" />
+    </Style>
+
+    <Style Selector="Button.ghost">
+      <Setter Property="Background" Value="#17212D" />
+      <Setter Property="Foreground" Value="#DDE5EF" />
+      <Setter Property="BorderBrush" Value="#273445" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="Button.nav">
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#94A2B5" />
+      <Setter Property="Padding" Value="14,11" />
+    </Style>
+
+    <Style Selector="Button.nav.active">
+      <Setter Property="Background" Value="#17251F" />
+      <Setter Property="Foreground" Value="#8BF0C9" />
+    </Style>
+
+    <Style Selector="TextBox.urlbox">
+      <Setter Property="Background" Value="#0A1018" />
+      <Setter Property="BorderBrush" Value="#2A3749" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="Padding" Value="16,13" />
+    </Style>
+
+    <Style Selector="ProgressBar">
+      <Setter Property="Height" Value="6" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Foreground" Value="#6EE7B7" />
+      <Setter Property="Background" Value="#202B38" />
+    </Style>
+
+    <Style Selector="ListBox.options">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="ListBox.options > ListBoxItem">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="0,0,0,8" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="ListBox.options > ListBoxItem:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="#17271F" />
+    </Style>
+
+</Styles>

@@ -85,10 +85,11 @@ public sealed class GenericHttpMediaProvider : IMediaProvider
         IProgress<DownloadProgress> progress,
         CancellationToken cancellationToken = default)
     {
-        Directory.CreateDirectory(context.DestinationDirectory);
         var convertToMp3 = context.Option.Id == "mp3-convert";
         if (convertToMp3 && (_ffmpeg is not { IsAvailable: true } || context.Option.Container != "mp3"))
             throw new InvalidOperationException("FFmpeg is required for MP3 conversion.");
+        if (convertToMp3) await _ffmpeg!.EnsureReadyAsync(cancellationToken).ConfigureAwait(false);
+        Directory.CreateDirectory(context.DestinationDirectory);
 
         var extension = NormalizeExtension(context.Option.Container);
         var fileName = SafeFileName.Create(context.Media.Title) + extension;

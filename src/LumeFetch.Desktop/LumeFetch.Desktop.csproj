@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LumeFetch.Core\LumeFetch.Core.csproj" />
+    <ProjectReference Include="..\LumeFetch.Presentation\LumeFetch.Presentation.csproj" />
     <ProjectReference Include="..\LumeFetch.Infrastructure\LumeFetch.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

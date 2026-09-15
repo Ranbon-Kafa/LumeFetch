@@ -4,21 +4,26 @@ using LumeFetch.Core.Providers;
 namespace LumeFetch.Core.Downloads;
 
 /// <summary>Owns scheduling and state. Pausing stops a transfer and retains resumable files.</summary>
-public sealed class DownloadManager : IDisposable, IAsyncDisposable
+public sealed partial class DownloadManager : IDisposable, IAsyncDisposable
 {
     private readonly object _sync = new();
     private readonly ProviderRegistry _providers;
+    private readonly IDownloadOutput? _output;
     private readonly List<Job> _jobs = [];
     private readonly List<Task> _tasks = [];
     private int _limit;
     private int _active;
     private bool _disposed;
 
-    public DownloadManager(ProviderRegistry providers, int maxParallelDownloads = 2)
+    public DownloadManager(ProviderRegistry providers, int maxParallelDownloads = 2, IDownloadOutput? output = null,
+        IDownloadQueueStore? queueStore = null, Action<string>? validateRestoredDirectory = null)
     {
         _providers = providers;
+        _output = output;
+        _queueStore = queueStore;
         ValidateLimit(maxParallelDownloads);
         _limit = maxParallelDownloads;
+        RestoreQueue(validateRestoredDirectory);
     }
 
     public event EventHandler<DownloadJobSnapshot>? JobChanged;
@@ -49,11 +54,18 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationDirectory);
         if (!media.Options.Contains(option))
             throw new ArgumentException("The option does not belong to the analyzed media.", nameof(option));
+        _output?.ValidateDestination(Path.GetFullPath(destinationDirectory));
         lock (_sync)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
+            if (_persistenceFailed) throw new IOException("QueueStorageFailed");
             var job = new Job(media, option, _providers.GetById(media.ProviderId), Path.GetFullPath(destinationDirectory));
             _jobs.Add(job);
+            if (!SaveCheckpoint())
+            {
+                _jobs.Remove(job);
+                throw new IOException("QueueStorageFailed");
+            }
             Publish(job);
             Schedule();
             return Snapshot(job);
@@ -70,7 +82,7 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
 
     public bool Resume(Guid jobId) => Change(jobId, job =>
     {
-        if (job.Status != DownloadStatus.Paused) return false;
+        if (_persistenceFailed || job.RequiresReview || job.Status != DownloadStatus.Paused) return false;
         job.Status = DownloadStatus.Queued;
         return true;
     });
@@ -85,7 +97,7 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
 
     public bool Retry(Guid jobId) => Change(jobId, job =>
     {
-        if (job.Status is not (DownloadStatus.Failed or DownloadStatus.Canceled)) return false;
+        if (_persistenceFailed || job.RequiresReview || job.Status is not (DownloadStatus.Failed or DownloadStatus.Canceled)) return false;
         job.Status = DownloadStatus.Queued;
         job.Error = null;
         job.Progress = new DownloadProgress(0, null, 0, null);
@@ -101,10 +113,11 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
             foreach (var job in _jobs)
             {
                 if (job.Status is DownloadStatus.Completed or DownloadStatus.Canceled or DownloadStatus.Failed) continue;
-                job.Status = DownloadStatus.Canceled;
+                job.Status = _queueStore is null ? DownloadStatus.Canceled : DownloadStatus.Paused;
                 job.Cancellation?.Cancel();
                 Publish(job);
             }
+            SaveCheckpoint();
         }
     }
 
@@ -123,6 +136,7 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
             if (_disposed) return false;
             var job = _jobs.Find(item => item.Id == id);
             if (job is null || !action(job)) return false;
+            if (!SaveCheckpoint() && job.Status == DownloadStatus.Queued) job.Status = DownloadStatus.Paused;
             Publish(job);
             Schedule();
             return true;
@@ -132,14 +146,20 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
     // Under _sync: resumed/retried jobs wait until their previous attempt has exited.
     private void Schedule()
     {
-        if (_disposed) return;
+        if (_disposed || _persistenceFailed) return;
         foreach (var job in _jobs.Where(item => item.Status == DownloadStatus.Queued && !item.Running))
         {
             if (_active >= _limit) break;
+            job.Status = DownloadStatus.Downloading;
+            if (!SaveCheckpoint())
+            {
+                job.Status = DownloadStatus.Paused;
+                Publish(job);
+                break;
+            }
             job.Running = true;
             job.Cancellation = new CancellationTokenSource();
             var token = job.Cancellation.Token;
-            job.Status = DownloadStatus.Downloading;
             _active++;
             Publish(job);
             _tasks.Add(Task.Run(() => RunAsync(job, token)));
@@ -158,33 +178,55 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
                     if (token.IsCancellationRequested || job.Status is not (DownloadStatus.Downloading or DownloadStatus.Processing)) return;
                     job.Progress = value;
                     job.Status = value.Stage == "Processing" ? DownloadStatus.Processing : DownloadStatus.Downloading;
+                    SaveCheckpoint(progressOnly: true);
                     Publish(job);
                 }
             });
-            var result = await job.Provider.DownloadAsync(
+            _output?.ValidateDestination(job.Directory);
+            var result = job.PendingOutput ?? await job.Provider.DownloadAsync(
                 new DownloadContext(job.Id, job.Media, job.Option, job.Directory, new PauseController()), progress, token).ConfigureAwait(false);
+            if (_output is not null)
+            {
+                // Retain the complete local file if export fails or is canceled. Retry does not redownload it.
+                lock (_sync)
+                {
+                    job.PendingOutput = result;
+                    // Persist ambiguity before creating an external document. A killed export is never replayed automatically.
+                    job.ExportInProgress = true;
+                    if (!SaveCheckpoint()) throw new IOException("QueueStorageFailed");
+                }
+                progress.Report(new DownloadProgress(result.BytesWritten, result.BytesWritten, 0, null, "Processing"));
+                result = await _output.PublishAsync(result, job.Directory, token).ConfigureAwait(false);
+            }
             lock (_sync)
             {
                 // A successful return means the provider atomically committed a complete output.
                 job.Output = result.OutputPath;
+                job.OutputDisplayPath = result.DisplayPath;
+                job.PendingOutput = null;
+                job.ExportInProgress = false;
                 job.Progress = new DownloadProgress(result.BytesWritten, result.BytesWritten, 0, TimeSpan.Zero);
                 job.Status = DownloadStatus.Completed;
                 job.Error = null;
+                SaveCheckpoint();
                 Publish(job);
             }
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
             // Pause/cancel/retry already set the intended next state.
+            lock (_sync) { job.ExportInProgress = false; SaveCheckpoint(); }
         }
         catch (Exception exception)
         {
             lock (_sync)
             {
+                job.ExportInProgress = false;
                 if (!token.IsCancellationRequested)
                 {
                     job.Error = exception.Message;
                     job.Status = DownloadStatus.Failed;
+                    SaveCheckpoint();
                     Publish(job);
                 }
             }
@@ -206,7 +248,7 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
     private static DownloadJobSnapshot Snapshot(Job job) => new(
         job.Id, job.CreatedAt, job.Media.Title, job.Provider.DisplayName, job.Option.Container.ToUpperInvariant() + " · " + job.Option.QualityLabel,
         job.Status, job.Progress.Percentage, job.Progress.BytesReceived, job.Progress.TotalBytes,
-        job.Progress.BytesPerSecond, job.Progress.EstimatedRemaining, job.Output, job.Error);
+        job.Progress.BytesPerSecond, job.Progress.EstimatedRemaining, job.Output, job.Error, job.OutputDisplayPath, job.RequiresReview);
 
     private static void ValidateLimit(int value)
     {
@@ -221,8 +263,8 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
 
     private sealed class Job(MediaInfo media, DownloadOption option, IMediaProvider provider, string directory)
     {
-        public Guid Id { get; } = Guid.NewGuid();
-        public DateTimeOffset CreatedAt { get; } = DateTimeOffset.UtcNow;
+        public Guid Id { get; init; } = Guid.NewGuid();
+        public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
         public MediaInfo Media { get; } = media;
         public DownloadOption Option { get; } = option;
         public IMediaProvider Provider { get; } = provider;
@@ -232,6 +274,10 @@ public sealed class DownloadManager : IDisposable, IAsyncDisposable
         public DownloadStatus Status { get; set; } = DownloadStatus.Queued;
         public DownloadProgress Progress { get; set; } = new(0, null, 0, null);
         public string? Output { get; set; }
+        public string? OutputDisplayPath { get; set; }
+        public DownloadResult? PendingOutput { get; set; }
+        public bool ExportInProgress { get; set; }
+        public bool RequiresReview { get; set; }
         public string? Error { get; set; }
     }
 }

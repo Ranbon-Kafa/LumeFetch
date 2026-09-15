@@ -1,5 +1,41 @@
 # Changelog
 
+## Android 1.1.0-beta.1 — 2026-09-15
+
+- First public ARM64 Android beta, version code 10, with a permanent release key.
+- Removed the temporary developer diagnostics card; friendly startup retry remains.
+- Bundled native/Python source archives, transitive notices and checksum files
+  accompany the APK. .NET/Android/Avalonia/graphics/Java and font notices are included.
+- Maintainer confirms build 7 MP3 and MP4 downloads on S25 Ultra / Android 16.
+  Wider device, provider and background/storage acceptance is still beta work.
+
+- Extracted the existing feature-complete UI into the portable Presentation project;
+  Windows continues using the same view models, commands and backend services.
+- Responsive navigation, forms, format rows, playlist and queue controls, with
+  320–1220px headless layout/command verification and live Turkish/English labels.
+- Compiled UI bindings and reflection-free settings/provider JSON for mobile/AOT
+  preparation; existing desktop settings and download plan schemas are retained.
+- Host-supplied settings defaults and catalog-session contracts; Spotify stays disabled.
+- Native Android host with pinned embedded Python/yt-dlp/QuickJS/FFmpeg, safe
+  runtime extraction, process-group cancellation and platform tool commands.
+- SAF folder grants/export, shared URLs, foreground notification/wake-lock
+  lifecycle and export retry without redownloading completed media.
+- Private Android queue/history checkpoints, paused process-death recovery,
+  export-ambiguity protection and preserved corrupt journals. Force-stop/resume
+  verified on the emulator with matching output hashes. Download navigation now
+  scrolls to the queue controls even when its heading is already visible.
+- ARM64 Debug and x86_64 Debug/Release APK builds with development signing.
+  Emulator-tested native MP3/Opus, UI MP3 export, pause/HTTP-range resume and
+  background completion with matching hashes; 110 unit cases pass.
+- Tool diagnostics preserve native startup errors, and processing-required
+  transfers check FFmpeg/FFprobe before downloading media.
+- Corrected Android Python packaging to exclude SDK linker aliases that shadowed
+  Samsung's system crypto library. Private OpenSSL/SQLite dependencies remain
+  bundled; 13 packaging-policy regression cases guard against recurrence.
+  The maintainer's build 7 physical-device retest passed MP3 and MP4.
+- Spotify remains disabled, no iOS host/IPA is implemented, and Windows v1.0.0
+  release assets are unchanged. See docs/MOBILE.md for exact beta limitations.
+
 ## 1.0.0 — 2026-09-06
 
 - Graceful, localized recovery if the Windows clipboard or folder picker fails.

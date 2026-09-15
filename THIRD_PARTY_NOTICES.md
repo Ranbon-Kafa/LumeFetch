@@ -2,7 +2,16 @@
 
 LumeFetch's own code is MIT-licensed. **Bundled tools and their components retain
 their separate licenses; the complete Windows package is not MIT-only.**
-Binary identities are pinned in `packaging/windows/dependencies.json`.
+The Windows sections below describe Windows only. For Android, see the separate
+[Android redistribution record](packaging/android/REDISTRIBUTION.md) and the
+[APK, matching source archives and notices](https://github.com/Ranbon-Kafa/LumeFetch/releases/tag/android-v1.1.0-beta.1).
+Android FFmpeg uses LGPLv3 with OpenSSL 3; it does not ship Deno or the old Maven
+runtime. Its complete notices are embedded in `assets/notices/third-party-notices.zip`
+in the APK and also provided as a separate release ZIP. LumeFetch's MIT license
+does not override any of these terms. Source, modification and relinking
+instructions are included with the Android corresponding-sources archive.
+
+Windows binary identities are pinned in `packaging/windows/dependencies.json`.
 Exact source origins and hashes are in `packaging/windows/sources.json` and the
 generated `licenses/source-inventory.json`; binary hashes are recorded in
 `licenses/tool-binaries.json`.

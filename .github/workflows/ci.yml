@@ -23,3 +23,8 @@ jobs:
       - run: dotnet restore LumeFetch.sln
       - run: dotnet build LumeFetch.sln --configuration Release --no-restore
       - run: dotnet test LumeFetch.sln --configuration Release --no-build
+      - name: Reject Android runtime library aliases that shadow system libraries
+        shell: pwsh
+        run: ./scripts/Test-AndroidLibraryIsolationPolicy.ps1
+      - name: Verify shared desktop and phone-sized layouts
+        run: dotnet run --project tools/LumeFetch.Screenshot --configuration Release --no-build -- artifacts/ui-verification/desktop.png

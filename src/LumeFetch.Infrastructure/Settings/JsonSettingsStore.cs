@@ -3,9 +3,9 @@ using LumeFetch.Core.Settings;
 
 namespace LumeFetch.Infrastructure.Settings;
 
-public sealed class JsonSettingsStore(string filePath)
+public sealed class JsonSettingsStore(string filePath, AppSettings? defaults = null) : ISettingsStore
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    private readonly AppSettings _defaults = defaults ?? new AppSettings();
     public string FilePath { get; } = Path.GetFullPath(filePath);
     public string? LoadWarning { get; private set; }
 
@@ -20,10 +20,10 @@ public sealed class JsonSettingsStore(string filePath)
     public AppSettings Load()
     {
         LoadWarning = null;
-        if (!File.Exists(FilePath)) return new AppSettings();
+        if (!File.Exists(FilePath)) return _defaults;
         try
         {
-            var settings = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath), JsonOptions)
+            var settings = JsonSerializer.Deserialize(File.ReadAllText(FilePath), SettingsJsonContext.Default.AppSettings)
                 ?? throw new InvalidDataException("Empty settings.");
             settings.Validate();
             return settings;
@@ -31,7 +31,7 @@ public sealed class JsonSettingsStore(string filePath)
         catch (Exception exception) when (exception is JsonException or IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException)
         {
             LoadWarning = "Settings could not be loaded; defaults are in use. The original file is unchanged. " + exception.Message;
-            return new AppSettings();
+            return _defaults;
         }
     }
 
@@ -42,7 +42,7 @@ public sealed class JsonSettingsStore(string filePath)
         var temporary = FilePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
-            await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(settings, JsonOptions), cancellationToken).ConfigureAwait(false);
+            await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(settings, SettingsJsonContext.Default.AppSettings), cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
             File.Move(temporary, FilePath, overwrite: true);
         }

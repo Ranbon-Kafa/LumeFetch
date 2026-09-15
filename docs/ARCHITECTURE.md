@@ -10,15 +10,27 @@ external backend.
 ## Dependency direction
 
 ```text
-LumeFetch.Desktop --------> LumeFetch.Core
-         |                         ^
-         +--> LumeFetch.Infrastructure
-                                    |
-                                    +--> LumeFetch.Core
+Desktop / Android ------> LumeFetch.Presentation -------> LumeFetch.Core
+         |                                                     ^
+         +--------------> LumeFetch.Infrastructure ------------+
 ```
 
 `Core` cannot reference Avalonia, operating-system APIs, FFmpeg, yt-dlp, or a
-specific storage implementation. `Desktop` is the composition root.
+specific storage implementation. Desktop and Android each have a composition root.
+
+`Presentation` has no dependency on Desktop, Infrastructure or Avalonia.Desktop.
+It exposes a `MainView` UserControl, the original command/view-model surface and
+the shared theme. Desktop's MainWindow only owns window lifetime and shutdown.
+Native hosts must supply working providers, processing, storage and lifecycle
+services; they must not reuse desktop subprocess adapters on iOS or label a
+UI-only build as a feature-equivalent mobile release. See [MOBILE.md](MOBILE.md).
+
+Settings are injected through `ISettingsStore`; catalog login through
+`ICatalogSession`. Settings defaults can point to a host's sandbox instead of
+assuming a desktop Downloads directory. Generated JSON metadata and compiled
+Avalonia bindings avoid reflection-dependent model access. The tests explicitly
+disable reflection-based JSON serialization. This is preparation, not an iOS AOT
+build certification.
 
 ## Provider contract
 
@@ -50,7 +62,7 @@ See SPOTIFY.md for access and policy limitations.
 ## Collections and localization
 
 `IMediaCollectionProvider` expands a playlist into ordered `CollectionEntry`
-rows, preserving unavailable items. The desktop layer snapshots selected rows,
+rows, preserving unavailable items. The shared presentation layer snapshots selected rows,
 destination and quality before sequential per-item analysis. It checks cancellation
 before enqueueing each actual format. Jobs then use the application's normal
 bounded queue. Stopping preparation does not cancel already queued downloads.
@@ -92,7 +104,28 @@ Direct HTTP uses a job-isolated partial file plus a strong ETag. Resume requests
 send Range and If-Range, validate the returned range, and restart safely if the
 entity or range support changed. Outputs use atomic no-overwrite moves; parallel
 jobs never share a staging path. Terminal state cannot be reverted by late progress.
-The queue is in memory; settings are schema-versioned JSON saved atomically.
+Desktop keeps its existing in-memory queue. Android injects `IDownloadQueueStore`,
+using a private schema-v1 JSON checkpoint with same-directory atomic replacement
+and a flushed temporary file. Job IDs, formats, destinations, progress and history
+survive process death. Unfinished jobs restore paused and never auto-start.
+Progress checkpoints are throttled to two seconds; state transitions are not.
+The provider's actual partial file/ETag remains authoritative on resume.
+
+`IDownloadOutput` separates provider completion from platform publication. Android
+uses a persisted SAF tree grant, private transfer staging and a fresh document
+per export. Known export failures retain the completed local file for retry.
+An export-intent checkpoint precedes any external document creation; if killed
+in that window, the restored row requires manual folder review and cannot retry.
+This avoids silently duplicating potentially committed files. SAF is not an
+atomic filesystem rename, and cleanup of an interrupted document may be manual.
+
+Unreadable/unsupported journals are preserved, with new work blocked. Save
+failures latch the scheduler closed and surface a UI warning. The current journal
+is bounded to 2,000 jobs / 16 MiB; history pruning/recovery UI remains future work.
+These are process-death guarantees, not a power-loss durability certification.
+Paths are host-validated; Android records stay in private storage with backup
+disabled. URLs may contain access parameters, so do not include journals in
+public diagnostics. Settings are also schema-versioned JSON saved atomically.
 
 ## External tools
 
@@ -110,5 +143,5 @@ The queue is in memory; settings are schema-versioned JSON saved atomically.
 
 - Application releases follow semantic versioning.
 - Plugin API compatibility uses a separate integer contract version.
-- Persisted settings currently use schema version 1; future persisted queue state
-  will have its own schema version.
+- Persisted settings and optional queue checkpoints each use their own schema
+  version 1. Unsupported queue schemas are not overwritten.

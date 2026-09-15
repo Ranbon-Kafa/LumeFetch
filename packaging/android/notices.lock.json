@@ -1,0 +1,6 @@
+[
+  { "file": "Avalonia-LICENSE.txt", "url": "https://raw.githubusercontent.com/AvaloniaUI/Avalonia/d3c867a9e2de379249b03dbeb3495bd7f076a81a/licence.md", "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b" },
+  { "file": "Avalonia.BuildServices-LICENSE.txt", "url": "https://raw.githubusercontent.com/AvaloniaUI/Avalonia.BuildServices/777f975b0a0cecf0311273711d56697212c558c0/LICENSE", "sha256": "94162c40c663bd96ec1b870e6aba6ef0a43f44c9eb500807e7965e7078f6dc47" },
+  { "file": "MicroCom-LICENSE.txt", "url": "https://raw.githubusercontent.com/kekekeks/MicroCom/76785efcafd91b5902fd19dd11145f6dd655b7b4/LICENSE", "sha256": "6ee769c9ac4dac9abb16b98b1341e9528ff9f4ab685481410d3376d14148f3a9" },
+  { "file": "Inter-LICENSE.txt", "url": "https://raw.githubusercontent.com/rsms/inter/v4.1/LICENSE.txt", "sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a" }
+]
