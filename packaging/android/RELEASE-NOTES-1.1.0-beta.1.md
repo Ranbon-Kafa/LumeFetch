@@ -13,6 +13,7 @@ indirmez. İnternet yalnızca içerik analizi/indirme gibi çevrimiçi işler i�
 - S25 Ultra / Android 16’da MP3/MP4’ü engelleyen kütüphane çakışması düzeltildi.
   Build 7’nin iki formatta çalıştığı proje sahibi tarafından doğrulandı.
 - Geçici geliştirici/tanılama kartı Ayarlar’dan kaldırıldı.
+- Hata bildirimi görünürken kalite listesinin dar ekrana uyumu düzeltildi.
 - Kalıcı yayın imzası, dosya özetleri, açık kaynak lisansları ve eşleşen kaynaklar.
 - Spotify kapalı. iOS sürümü yok; iOS çalışması beklemede.
 
@@ -47,7 +48,7 @@ FFmpeg LGPLv3 yapılandırması kullanır. Aynı yayındaki `corresponding-sourc
 tam eşleşen yerel araç/Python kaynaklarını, yamaları, derleme tariflerini ve
 uygulama kaynağını içerir. `notices.zip` bildirimleri APK içinde de bulunur.
 
-APK SHA-256: `3d69efd339195e19dfff271524287cd05ed695087436575cd8014d8cb022c115`
+APK SHA-256: `571661a4f21b09683ee3bf2bd0c8f84ee69385bf9a535c306a56f23813115a79`
 
 Sertifika SHA-256: `D9A78375002A9948147BF17E03F9E7E60840476E56DAA4BBB0C4B782AC376B90`
 

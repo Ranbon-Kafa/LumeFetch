@@ -137,11 +137,15 @@ cache; settings/history are not cleared and old test artifacts are retained.
 - ARM64 and x86_64 Release builds: zero warnings/errors. Notice archive avoids
   Windows aapt2 path-length limits without dropping any of the collected texts.
 - Public ARM64 APK: 62,950,227 bytes, version `1.1.0-beta.1`, code 10. SHA-256:
-  `3d69efd339195e19dfff271524287cd05ed695087436575cd8014d8cb022c115`.
+  `571661a4f21b09683ee3bf2bd0c8f84ee69385bf9a535c306a56f23813115a79`.
   Permanent RSA-4096 certificate matches SIGNING.md, APK v2/v3 verified;
   application is not debuggable. Runtime payload/manifest/bootstrap and embedded
   notice ZIP match their reviewed inputs; 177 ELF files pass 16-KB alignment.
 - Final restored Android graph matches all 78 collected NuGet package identities.
+- Clean GitHub CI exposed a format-row reflow bug when a tool failure banner
+  changes the viewport. The small format list now measures every row and disables
+  horizontal scrolling. Layout tests explicitly cover both tool-ready and
+  tool-unavailable states at every width; clean-environment and GitHub CI pass.
 - x86_64 **Release configuration** beta installs over the existing emulator test
   app without clearing settings/history. FFmpeg is ready; diagnostic settings
   card is absent. Screenshot: `docs/screenshots/lumefetch-android-settings.png`.

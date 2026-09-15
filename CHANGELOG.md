@@ -4,6 +4,8 @@
 
 - First public ARM64 Android beta, version code 10, with a permanent release key.
 - Removed the temporary developer diagnostics card; friendly startup retry remains.
+- Fixed format-row reflow in narrow tool-error layouts, with ready/unavailable
+  UI states checked independently of the machine's installed tools.
 - Bundled native/Python source archives, transitive notices and checksum files
   accompany the APK. .NET/Android/Avalonia/graphics/Java and font notices are included.
 - Maintainer confirms build 7 MP3 and MP4 downloads on S25 Ultra / Android 16.
