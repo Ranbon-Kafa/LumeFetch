@@ -327,8 +327,11 @@
 
             <Border Grid.Row="2" Background="#0B1119" CornerRadius="12" Padding="10">
               <ListBox x:Name="FormatOptions" Classes="options" MaxHeight="250"
+                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                        ItemsSource="{Binding Options}"
                        SelectedItem="{Binding SelectedOption, Mode=TwoWay}">
+                <!-- Format choices are short; measure all rows so off-screen items also reflow on resize. -->
+                <ListBox.ItemsPanel><ItemsPanelTemplate><StackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                   <DataTemplate x:DataType="vm:DownloadOptionViewModel">
                     <Border BorderBrush="#263343" BorderThickness="1" CornerRadius="10" Padding="14,11">

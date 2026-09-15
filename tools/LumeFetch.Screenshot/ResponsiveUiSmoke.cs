@@ -20,8 +20,10 @@ namespace LumeFetch.Screenshot;
 internal static partial class Program
 {
     // These are host-independent UI checks, not a claim of Android/iOS download support.
-    private static async Task VerifyResponsiveUiAsync(string output)
+    private static async Task VerifyResponsiveUiAsync(string output, bool processingAvailable)
     {
+        output = Path.Combine(output, processingAvailable ? "tools-ready" : "tools-unavailable");
+        Directory.CreateDirectory(output);
         Require(!typeof(MainView).Assembly.GetReferencedAssemblies().Any(assembly =>
             assembly.Name is "LumeFetch.Desktop" or "LumeFetch.Infrastructure" or "Avalonia.Desktop"),
             "Shared UI has no desktop/backend dependencies");
@@ -32,7 +34,7 @@ internal static partial class Program
         var registry = new ProviderRegistry([new PreviewProvider()]);
         await using var manager = new DownloadManager(registry);
         using var vm = new MainWindowViewModel(new MediaAnalysisService(registry), manager,
-            new FFmpegService(), store, settings, collections: new PreviewCatalog(), platformName: "Android",
+            new DiagnosticsFixture { Fail = !processingAvailable }, store, settings, collections: new PreviewCatalog(), platformName: "Android",
             applicationVersion: "1.1.0-beta.1");
         var view = new MainView { DataContext = vm };
         var host = new Window { Width = 390, Height = 844, Content = view };
@@ -152,7 +154,7 @@ internal static partial class Program
             var origin = text.TranslatePoint(default, view);
             if (origin is { } point)
                 Require(point.X >= -1 && point.X + text.Bounds.Width <= view.Bounds.Width + 1,
-                    "No clipped label: " + text.Text);
+                    $"No clipped label: {text.Text}; origin={point}; bounds={text.Bounds}; viewport={view.Bounds.Size}");
         }
     }
 }

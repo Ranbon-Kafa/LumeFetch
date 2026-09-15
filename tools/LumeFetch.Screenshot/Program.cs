@@ -37,7 +37,8 @@ internal static partial class Program
                 var output = args.FirstOrDefault(arg => !arg.StartsWith("--", StringComparison.Ordinal))
                     ?? Path.Combine("docs", "screenshots", "lumefetch-main.png");
                 await RenderAndVerifyAsync(Path.GetFullPath(output));
-                await VerifyResponsiveUiAsync(Path.GetDirectoryName(Path.GetFullPath(output))!);
+                await VerifyResponsiveUiAsync(Path.GetDirectoryName(Path.GetFullPath(output))!, processingAvailable: true);
+                await VerifyResponsiveUiAsync(Path.GetDirectoryName(Path.GetFullPath(output))!, processingAvailable: false);
                 await VerifyProcessingAvailabilityAsync(Path.GetDirectoryName(Path.GetFullPath(output))!);
             }
             catch (Exception exception) { Console.Error.WriteLine(exception); exitCode = 1; }
