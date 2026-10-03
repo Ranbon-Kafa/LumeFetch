@@ -3,6 +3,8 @@ bin/
 obj/
 artifacts/
 TestResults/
+__pycache__/
+*.pyc
 
 # Local SDK and tools
 .tools/

@@ -15,7 +15,7 @@ indirmez. İnternet yalnızca içerik analizi/indirme gibi çevrimiçi işler i�
 - Geçici geliştirici/tanılama kartı Ayarlar’dan kaldırıldı.
 - Hata bildirimi görünürken kalite listesinin dar ekrana uyumu düzeltildi.
 - Kalıcı yayın imzası, dosya özetleri, açık kaynak lisansları ve eşleşen kaynaklar.
-- Spotify kapalı. iOS sürümü yok; iOS çalışması beklemede.
+- Spotify kapalı.
 
 ## Kurulum ve test APK’sından geçiş
 
@@ -61,7 +61,7 @@ First public **Android ARM64 beta**, minimum Android 8/API 26, version code 10.
 All runtime tools are bundled. Removes the temporary diagnostics UI and retains
 the S25 library-isolation fix. MP3/MP4 passed maintainer testing on build 7;
 the final signed beta is not yet physically retested. Wider device/provider and
-background/storage coverage remains beta work. Spotify is disabled; iOS is on hold.
+background/storage coverage remains beta work. Spotify is disabled.
 
 The permanent release certificate differs from private debug builds. Export your
 important downloads before choosing to remove a test build: removal loses private

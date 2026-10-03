@@ -83,7 +83,7 @@ public sealed class PortableSettingsTests
     {
         var catalog = new TranslationCatalog(language);
         Assert.Equal("v1.1.0-dev · Android", catalog.Format("VersionPlatform", "Android", "1.1.0-dev"));
-        Assert.Equal("v1.0.0 · iOS", catalog.Format("VersionPlatform", "iOS", "1.0.0"));
+        Assert.Equal("v1.0.0 · Linux", catalog.Format("VersionPlatform", "Linux", "1.0.0"));
         Assert.NotEqual("FolderAccessUnavailable", catalog["FolderAccessUnavailable"]);
     }
 }

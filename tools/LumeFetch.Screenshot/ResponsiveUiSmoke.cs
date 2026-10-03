@@ -19,7 +19,7 @@ namespace LumeFetch.Screenshot;
 
 internal static partial class Program
 {
-    // These are host-independent UI checks, not a claim of Android/iOS download support.
+    // These are host-independent UI checks, not a claim of Android download support.
     private static async Task VerifyResponsiveUiAsync(string output, bool processingAvailable)
     {
         output = Path.Combine(output, processingAvailable ? "tools-ready" : "tools-unavailable");

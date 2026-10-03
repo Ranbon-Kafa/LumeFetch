@@ -1,6 +1,6 @@
 # Android signing and device acceptance
 
-iOS is on hold. Target acceptance phone reported by the maintainer: **Samsung
+Target acceptance phone reported by the maintainer: **Samsung
 Galaxy S25 Ultra, Android 16**. On 2026-09-10 the maintainer confirmed both MP3
 and MP4 downloads work in build 7. See ACCEPTANCE.md for the remaining beta matrix.
 

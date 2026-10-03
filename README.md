@@ -56,7 +56,7 @@ QuickJS are already bundled; no first-launch tool download is required.
 Choose a writable folder in Settings, save it, then paste/share an authorized URL.
 The same playlist, format and queue commands are available with phone navigation.
 Background work remains subject to Android limits; unfinished jobs reopen paused.
-Spotify is disabled and iOS is on hold. See [test coverage and limitations](packaging/android/ACCEPTANCE.md).
+Spotify is disabled. See [test coverage and limitations](packaging/android/ACCEPTANCE.md).
 
 **Migrating from a private test APK:** the public APK uses a new permanent signing
 certificate. Android cannot update a debug-signed test installation with this key.
@@ -103,7 +103,7 @@ source builds are architectural targets, not tested or packaged v1 releases.
 
 Android is distributed separately as a beta ARM64 APK. The shared UI adapts to
 phone widths without removing desktop commands. See [Android build instructions](packaging/android/NATIVE-BUILD.md)
-and [mobile architecture and limitations](docs/MOBILE.md). No iOS app is available.
+and [mobile architecture and limitations](docs/MOBILE.md).
 
 ```powershell
 dotnet restore LumeFetch.sln

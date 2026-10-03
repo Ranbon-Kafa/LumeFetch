@@ -110,7 +110,7 @@ CPython dependency recipes are shipped, including their upstream patches.
 - Keep using the permanent release identity in SIGNING.md; back it up privately.
   Local development and disposable signing-test keys are never release identities.
 
-No iOS work or private website modifications are included.
+No private website modifications are included.
 
 ## Provenance references
 

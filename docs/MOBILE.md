@@ -1,4 +1,4 @@
-# Android / iOS adaptation
+# Android adaptation
 
 Status (2026-09-15): **Android 1.1.0-beta.1**, ARM64 APK, version code 10.
 The maintainer confirmed build 7 MP3/MP4 on S25 Ultra / Android 16. Beta 1 keeps
@@ -9,7 +9,7 @@ See [release files](https://github.com/Ranbon-Kafa/LumeFetch/releases/tag/androi
 [source/build instructions](../packaging/android/NATIVE-BUILD.md) and
 [licenses](../packaging/android/REDISTRIBUTION.md).
 
-iOS is explicitly on hold. Windows v1.0.0 release assets are unchanged. The
+Windows v1.0.0 release assets are unchanged. The
 feature surface is shared, but full mobile device/provider parity is not claimed.
 
 ## Product contract
@@ -106,7 +106,7 @@ Android host (`src/LumeFetch.Android`):
   not a public release identity (including the Release configuration).
 
 These are not physical-device certification, live-platform acceptance, an
-endurance test or iOS verification. Ignored `artifacts/android/emulator` contains
+endurance test. Ignored `artifacts/android/emulator` contains
 actual emulator captures and fixture output, not marketing screenshots.
 
 ## Historical native replacement work (September 9–10)
@@ -138,7 +138,7 @@ The old AAR runtime is retained only for historical comparison; do **not** use i
 Build-Android now requires an explicit source-built `-BundledToolsDirectory`.
 The beta includes native sources, collected notices and permanent release signing.
 Wider provider/device and long lifecycle acceptance remains open, so it is not
-labelled stable. Spotify remains disabled and iOS remains on hold.
+labelled stable. Spotify remains disabled.
 
 Windows prerequisites: .NET SDK from `global.json`, `android` workload, Android
 SDK API 36/build-tools and compatible JDK. These are installed on the current
@@ -197,24 +197,6 @@ The source audit and reproducible inventory procedure are tracked in
 [packaging/android/README.md](../packaging/android/README.md). The inventory does
 not certify corresponding sources or license completeness.
 
-## iOS: on hold (maintainer decision)
-
-Do not start iOS implementation as part of the current Android completion task.
-No iOS host, IPA or installation profile exists in this change. The maintainer
-has an iPhone but no Mac. A macOS/Xcode build environment, potentially a suitable
-GitHub macOS runner, is required; no such job has been configured or run.
-
-The desktop/Android subprocess backend cannot simply go into an IPA. iOS needs
-in-process extraction/JavaScript and signed native FFmpeg libraries, Files/
-security-scoped storage, background transfer/suspension handling, a native host
-and physical iPhone acceptance. Shared Core/Presentation is ready for adapters
-but does not implement them. No undisclosed remote server or lite substitute
-is introduced.
-
-Distribution needs a documented signing/sideloading route; a generic
-`.mobileconfig` does not install this arbitrary native app. Do not request Apple
-passwords/signing keys in chat or modify the private ruzgarefe.com repository.
-
 ## References
 
 - [Avalonia shared architecture](https://docs.avaloniaui.net/docs/app-development/cross-platform-solution-setup)
@@ -222,5 +204,3 @@ passwords/signing keys in chat or modify the private ruzgarefe.com repository.
 - [Android foreground services](https://developer.android.com/develop/background-work/services/fgs/service-types)
 - [Android background timeouts](https://developer.android.com/develop/background-work/services/fgs/timeout)
 - [.NET Process.Start platforms](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-10.0)
-- [Python on iOS](https://docs.python.org/3/using/ios.html)
-- [Apple ad hoc signing](https://developer.apple.com/help/account/provisioning-profiles/create-an-ad-hoc-provisioning-profile)

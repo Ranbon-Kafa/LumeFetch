@@ -6,7 +6,7 @@ private runtime library names, transitive notices and corresponding sources
 replace it. Read [native build instructions](NATIVE-BUILD.md),
 [redistribution details](REDISTRIBUTION.md), [signing identity](SIGNING.md) and
 [test coverage](ACCEPTANCE.md). Windows v1.0.0 is unchanged; Spotify is disabled;
-iOS and the private website remain out of scope.
+The private website remains out of scope.
 
 ## Historical audit of the rejected Maven candidate (September 9)
 

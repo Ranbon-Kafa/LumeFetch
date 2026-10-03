@@ -56,7 +56,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         _destinationLabel = destinationLabel;
         _applicationVersion = applicationVersion;
         _processingContext = processingContext;
-        _platformName = platformName ?? (OperatingSystem.IsAndroid() ? "Android" : OperatingSystem.IsIOS() ? "iOS" :
+        _platformName = platformName ?? (OperatingSystem.IsAndroid() ? "Android" :
             OperatingSystem.IsWindows() ? "Windows" : OperatingSystem.IsMacOS() ? "macOS" : "Linux");
         _downloadManager = downloadManager;
         _ffmpeg = ffmpeg;

@@ -35,7 +35,7 @@
   Samsung's system crypto library. Private OpenSSL/SQLite dependencies remain
   bundled; 13 packaging-policy regression cases guard against recurrence.
   The maintainer's build 7 physical-device retest passed MP3 and MP4.
-- Spotify remains disabled, no iOS host/IPA is implemented, and Windows v1.0.0
+- Spotify remains disabled, and Windows v1.0.0
   release assets are unchanged. See docs/MOBILE.md for exact beta limitations.
 
 ## 1.0.0 — 2026-09-06

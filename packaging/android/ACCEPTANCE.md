@@ -168,4 +168,4 @@ cache; settings/history are not cleared and old test artifacts are retained.
 - Maintainer-owned portable signing-key/password backup. DPAPI local storage
   does not survive migration to a different Windows account/computer by itself.
 
-Spotify remains disabled. iOS and the private website are out of scope.
+Spotify remains disabled. The private website is out of scope.

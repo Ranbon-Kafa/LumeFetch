@@ -22,15 +22,13 @@ specific storage implementation. Desktop and Android each have a composition roo
 It exposes a `MainView` UserControl, the original command/view-model surface and
 the shared theme. Desktop's MainWindow only owns window lifetime and shutdown.
 Native hosts must supply working providers, processing, storage and lifecycle
-services; they must not reuse desktop subprocess adapters on iOS or label a
-UI-only build as a feature-equivalent mobile release. See [MOBILE.md](MOBILE.md).
+services appropriate to their platform. See [MOBILE.md](MOBILE.md).
 
 Settings are injected through `ISettingsStore`; catalog login through
 `ICatalogSession`. Settings defaults can point to a host's sandbox instead of
 assuming a desktop Downloads directory. Generated JSON metadata and compiled
 Avalonia bindings avoid reflection-dependent model access. The tests explicitly
-disable reflection-based JSON serialization. This is preparation, not an iOS AOT
-build certification.
+disable reflection-based JSON serialization.
 
 ## Provider contract
 
